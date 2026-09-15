@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit — razorbill.studio</title>
+
+<!--
+  ============================================================================
+  SITE EDITOR
+  ============================================================================
+
+  WHAT IT EDITS
+    index.html              the main site
+    data/entries.json       every collection and blog post
+    assets/                 photos and videos
+
+  WHERE IT SAVES  (pick one in the Save panel)
+    Folder   Chrome and Edge only. Writes straight into the site folder on
+             your computer. Best while working locally.
+    GitHub   Works in any browser, including on the deployed site. You paste
+             a personal access token once and Save commits the files to your
+             repo, which makes Vercel redeploy on its own.
+    Download Always available. Save hands you the files and you drop them in.
+
+  WHY NOT A SERVER
+    Vercel serves files read-only, so no backend can write into the site.
+    Committing through GitHub's API is the way an online editor actually
+    persists changes — and it gives you version history for free.
+
+  RUNNING IT LOCALLY
+    From the site folder:   python3 -m http.server 8000
+    Then open:              http://localhost:8000/edit.html
+  ============================================================================
+-->
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --pine-deep:#152019; --pine:#1E2E23; --cream:#E7E2D0; --sand:#D9D2BB;
+  --edge:rgba(231,226,208,.18); --accent:#8CA87A; --warn:#C97B5A;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{margin:0; display:flex; font-family:'Montserrat',-apple-system,'Segoe UI',sans-serif;
+     background:var(--pine-deep); color:var(--cream); font-size:14px;}
+button{font:inherit; cursor:pointer;}
+
+/* ---------- Layers rail ---------- */
+#rail{width:216px; flex:none; height:100%; overflow-y:auto;
+      border-right:1px solid var(--edge); padding:16px 12px 40px;}
+#rail h1{font-size:.95rem; margin:0 0 2px; padding:0 6px;}
+#rail .sub{font-size:.72rem; opacity:.55; margin:0 0 18px; padding:0 6px;}
+.layer-group{margin-bottom:16px;}
+.layer-group > h2{font-size:.63rem; letter-spacing:.14em; text-transform:uppercase;
+                  opacity:.5; margin:0 0 6px; padding:0 6px; font-weight:600;}
+.layer{display:flex; align-items:center; gap:7px; width:100%; text-align:left;
+       background:none; border:none; color:var(--cream); opacity:.72;
+       padding:6px 8px; border-radius:6px; font-size:.79rem; line-height:1.3;}
+.layer:hover{background:rgba(231,226,208,.07); opacity:1;}
+.layer.active{background:rgba(140,168,122,.2); opacity:1; font-weight:600;}
+.layer .tag{margin-left:auto; font-size:.58rem; opacity:.5; letter-spacing:.05em; white-space:nowrap; flex:none;}
+.layer .name{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
+/* ---------- Controls panel ---------- */
+#panel{width:290px; flex:none; height:100%; overflow-y:auto;
+       border-right:1px solid var(--edge); padding:16px 16px 60px;}
+.group{margin-bottom:20px;}
+.group > h2{font-size:.65rem; letter-spacing:.14em; text-transform:uppercase;
+            opacity:.55; margin:0 0 8px; font-weight:600;}
+.btn{display:block; width:100%; text-align:left; background:transparent; color:var(--cream);
+     border:1px solid var(--edge); border-radius:7px; padding:8px 11px; margin-bottom:5px;
+     transition:background .15s, border-color .15s; font-size:.82rem;}
+.btn:hover{background:rgba(231,226,208,.07); border-color:rgba(231,226,208,.4);}
+.btn.primary{background:var(--accent); color:var(--pine-deep); border-color:var(--accent);
+             font-weight:600; text-align:center;}
+.btn.primary:hover{background:#9DB98B;}
+.btn.danger:hover{background:var(--warn); border-color:var(--warn); color:var(--pine-deep);}
+.btn:disabled{opacity:.35; cursor:not-allowed;}
+.btn small{display:block; opacity:.6; font-size:.68rem; margin-top:2px;}
+.row{display:flex; gap:5px; flex-wrap:wrap; margin-bottom:6px;}
+.row .btn{margin:0; flex:1; text-align:center; padding:7px 4px; font-size:.75rem;}
+label.field{display:block; font-size:.7rem; opacity:.7; margin:0 0 4px;}
+input.field,select.field,textarea.field{
+  width:100%; background:rgba(0,0,0,.25); color:var(--cream); border:1px solid var(--edge);
+  border-radius:6px; padding:7px 9px; margin-bottom:9px; font:inherit; font-size:.79rem;}
+textarea.field{resize:vertical; min-height:62px;}
+input.field:focus,select.field:focus,textarea.field:focus{outline:2px solid var(--accent); outline-offset:1px;}
+#status{font-size:.74rem; line-height:1.5; padding:9px 11px; border-radius:7px;
+        background:rgba(0,0,0,.28); min-height:36px;}
+#status.ok{color:#A9C796;} #status.warn{color:var(--warn);}
+.hint{font-size:.7rem; line-height:1.55; opacity:.6;} .hint b{opacity:.9;}
+.sel-none{font-size:.74rem; opacity:.5; line-height:1.5;}
+
+/* ---------- Stage ---------- */
+#stage{flex:1; height:100%; display:flex; flex-direction:column; background:#0c1210; min-width:0;}
+#bar{flex:none; display:flex; align-items:center; gap:12px; padding:8px 16px;
+     border-bottom:1px solid var(--edge); font-size:.74rem; opacity:.8;}
+#bar .dot{width:8px; height:8px; border-radius:50%; background:var(--accent);}
+#bar .dot.dirty{background:var(--warn);}
+#bar .spacer{flex:1;}
+#bar button{background:none; border:1px solid var(--edge); color:var(--cream);
+            border-radius:5px; padding:4px 10px; font-size:.72rem;}
+#bar button:hover{background:rgba(231,226,208,.08);}
+#frame{flex:1; width:100%; border:none; background:var(--cream);}
+
+/* ---------- Entry editor (replaces the frame) ---------- */
+#entryPane{flex:1; overflow-y:auto; padding:26px 30px 80px; display:none; background:#0f1512;}
+#entryPane h2{font-size:1.15rem; margin:0 0 3px;}
+#entryPane .kind{font-size:.7rem; letter-spacing:.14em; text-transform:uppercase;
+                 opacity:.5; margin:0 0 20px;}
+.pane-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px;}
+.media-card{border:1px solid var(--edge); border-radius:9px; overflow:hidden; background:#0b100e;}
+.media-card .thumb{width:100%; height:120px; object-fit:cover; display:block; background:#161d19;}
+.media-card .meta{padding:8px; display:flex; gap:4px; flex-wrap:wrap;}
+.media-card .meta button{flex:1 1 30%; min-width:34px; background:none; border:1px solid var(--edge);
+  color:var(--cream); border-radius:4px; padding:4px; font-size:.68rem;}
+.media-card .meta button:hover{background:rgba(231,226,208,.1);}
+.media-card .meta button.on{background:var(--accent); color:var(--pine-deep); border-color:var(--accent);}
+.media-card .meta button.del:hover{background:var(--warn); border-color:var(--warn); color:var(--pine-deep);}
+.media-card select{width:100%; background:rgba(0,0,0,.3); border:1px solid var(--edge);
+  color:var(--cream); font:inherit; font-size:.7rem; padding:4px; border-radius:4px;}
+.media-card input{width:100%; background:rgba(0,0,0,.3); border:1px solid var(--edge);
+  color:var(--cream); font:inherit; font-size:.7rem; padding:5px 6px; border-radius:4px;}
+
+/* Blog composer */
+#composer{background:var(--cream); color:var(--pine-deep); border-radius:10px;
+          padding:26px 30px; min-height:320px; line-height:1.7; font-size:.95rem;
+          max-width:760px;}
+#composer:focus{outline:2px solid var(--accent);}
+#composer h2{font-size:1.5rem; margin:26px 0 10px; font-weight:800;}
+#composer h3{font-size:1.15rem; margin:22px 0 8px; font-weight:700;}
+#composer p{margin:0 0 14px;}
+#composer blockquote{margin:20px 0; padding-left:18px; border-left:3px solid var(--pine);}
+#composer figure{margin:22px 0;}
+#composer figure img,#composer figure video{width:100%; border-radius:8px;}
+#composer figure.w-narrow{max-width:62%; margin-left:auto; margin-right:auto;}
+#composer figure figcaption{font-size:.76rem; opacity:.7; text-align:center; margin-top:6px;}
+#composer figure.sel{outline:2px solid var(--accent); outline-offset:4px;}
+#toolbar{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:12px; max-width:760px;}
+#toolbar button,#toolbar select,#toolbar input[type=color]{
+  background:none; border:1px solid var(--edge); color:var(--cream);
+  border-radius:5px; padding:5px 9px; font-size:.75rem; font-family:inherit;}
+#toolbar button:hover{background:rgba(231,226,208,.1);}
+#toolbar input[type=color]{padding:2px; width:34px; height:29px; cursor:pointer;}
+</style>
+</head>
+
+<body>
+
+<!-- ============ LAYERS RAIL ============ -->
+<div id="rail">
+  <h1>Site editor</h1>
+  <p class="sub">razorbill.studio</p>
+  <div id="layers"></div>
+</div>
+
+<!-- ============ CONTROLS ============ -->
+<div id="panel">
+  <div class="group">
+    <h2>Save</h2>
+    <div class="row">
+      <button class="btn" id="btn-folder">Folder</button>
+      <button class="btn" id="btn-github">GitHub</button>
+    </div>
+    <button class="btn primary" id="btn-save">Save changes</button>
+  </div>
+
+  <!-- Contextual controls swap in here depending on what is selected -->
+  <div id="ctx"></div>
+
+  <div class="group">
+    <h2>Status</h2>
+    <div id="status">Loading…</div>
+  </div>
+
+  <div class="group">
+    <h2>Reset</h2>
+    <button class="btn danger" id="btn-reload">Discard changes and reload</button>
+  </div>
+</div>
+
+<!-- ============ STAGE ============ -->
+<div id="stage">
+  <div id="bar">
+    <span class="dot" id="dot"></span><span id="bar-text">index.html</span>
+    <span class="spacer"></span>
+    <button id="btn-preview">Preview in new tab</button>
+  </div>
+  <iframe id="frame" title="Site preview"></iframe>
+  <div id="entryPane"></div>
+</div>
+
+<script>
+/* ===========================================================================
+   STATE
+   =========================================================================== */
+const frame  = document.getElementById('frame');
+const pane   = document.getElementById('entryPane');
+const ctx    = document.getElementById('ctx');
+const statusEl = document.getElementById('status');
+const dot    = document.getElementById('dot');
+
+let db        = null;    // parsed data/entries.json
+let dirHandle = null;    // local folder handle
+let gh        = null;    // {token, owner, repo, branch}
+let pending   = [];      // {name, file} media not yet written
+let dirty     = false;
+let view      = 'home';  // 'home' or an entry id
+let selBlock  = null;    // block selected in the site preview
+let selImg    = null;    // image selected in the site preview
+let selFigure = null;    // figure selected in the blog composer
+
+const AR = [['Free',''],['1:1','1 / 1'],['4:3','4 / 3'],['3:2','3 / 2'],
+            ['16:9','16 / 9'],['9:16','9 / 16'],['4:5','4 / 5']];
+const ANIMS = [['None',''],['Fade','fade'],['Up','up'],['Left','left'],['Right','right'],['Zoom','zoom']];
+
+const TEXT_SEL  = 'h1,h2,h3,p,figcaption,span.year,span.source,span.label,a.btn-outline,.contact-note';
+const BLOCK_SEL = '.g-item,.note,.cred,.about-row,.tile,.hero,.welcome,.band,.sayhi';
+
+const uid = p => p + '-' + Math.random().toString(36).slice(2, 8);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function setStatus(m, k){ statusEl.textContent = m; statusEl.className = k || ''; }
+function markDirty(){
+  dirty = true; dot.classList.add('dirty');
+  document.getElementById('bar-text').textContent = 'unsaved changes';
+}
+
+
+/* ===========================================================================
+   LOAD
+   =========================================================================== */
+async function boot(){
+  try{
+    db = await (await fetch('data/entries.json', {cache:'no-store'})).json();
+  }catch{
+    setStatus('Could not read data/entries.json. Serve this folder over http — run "python3 -m http.server 8000".', 'warn');
+    return;
+  }
+  await loadSite();
+  renderLayers();
+  showHome();
+}
+
+async function loadSite(){
+  let html;
+  try{
+    html = await (await fetch('index.html', {cache:'no-store'})).text();
+  }catch{
+    setStatus('Could not read index.html.', 'warn'); return;
+  }
+  const base = new URL('.', location.href).href;
+  html = html.replace('<head>', `<head>\n<base id="ed-base" href="${base}">`);
+  await new Promise(res => { frame.onload = res; frame.srcdoc = html; });
+  setupEditing(frame.contentDocument);
+  dirty = false; dot.classList.remove('dirty');
+  document.getElementById('bar-text').textContent = 'index.html';
+  setStatus('Ready. Click any text or photo to change it.', 'ok');
+}
+
+
+/* ===========================================================================
+   LAYERS RAIL
+   =========================================================================== */
+function renderLayers(){
+  const g = [], n = [];
+  for (const [id, e] of Object.entries(db.entries)){
+    (e.type === 'note' ? n : g).push([id, e]);
+  }
+  const row = (id, label, tag) =>
+    `<button class="layer ${view === id ? 'active' : ''}" data-go="${id}">
+       <span class="name">${esc(label || 'Untitled')}</span><span class="tag">${tag}</span></button>`;
+
+  document.getElementById('layers').innerHTML = `
+    <div class="layer-group"><h2>Site</h2>
+      ${row('home', 'Home & pages', 'HTML')}
+    </div>
+    <div class="layer-group"><h2>Collections</h2>
+      ${g.map(([id, e]) => row(id, e.title, (e.media || []).length + ' media')).join('')}
+      <button class="layer" data-new="gallery"><span class="name">+ New collection</span></button>
+    </div>
+    <div class="layer-group"><h2>Field notes</h2>
+      ${n.map(([id, e]) => row(id, e.title, 'post')).join('')}
+      <button class="layer" data-new="note"><span class="name">+ New post</span></button>
+    </div>`;
+
+  document.getElementById('layers').onclick = ev => {
+    const go = ev.target.closest('[data-go]'), nw = ev.target.closest('[data-new]');
+    if (go) return go.dataset.go === 'home' ? showHome() : openEntry(go.dataset.go);
+    if (nw) return newEntry(nw.dataset.new);
+  };
+}
+
+function newEntry(type){
+  const id = uid(type === 'note' ? 'note' : 'gal');
+  db.entries[id] = type === 'note'
+    ? {type:'note', title:'New post', category:'Field note',
+       date:new Date().toISOString().slice(0,10), desc:'', cover:'',
+       blocks:[{t:'rich', html:'<p>Write your post here.</p>'}]}
+    : {type:'gallery', title:'New collection', year:String(new Date().getFullYear()),
+       desc:'', cover:'', media:[]};
+
+  // Add a matching card to the site so the new entry is reachable.
+  const doc = frame.contentDocument;
+  const tpl = type === 'note'
+    ? {sel:'.notes-grid', html:`<article class="note" data-entry="${id}">
+  <div class="placeholder-img"></div>
+  <h3>New post</h3>
+  <span class="source">Field note</span>
+  <p>Two lines on what this covers.</p>
+  <a class="btn-outline" href="entry.html?id=${id}">Read more</a>
+</article>`}
+    : {sel:'.gallery-grid', html:`<article class="g-item" data-entry="${id}">
+  <span class="year">${new Date().getFullYear()}</span>
+  <h3>New collection</h3>
+  <div class="placeholder-img"></div>
+  <p>One-line description of the shoot.</p>
+  <a class="btn-outline g-open" href="entry.html?id=${id}">View collection</a>
+</article>`};
+
+  const host = doc.querySelector(tpl.sel);
+  if (host){
+    const w = doc.createElement('div'); w.innerHTML = tpl.html.trim();
+    host.appendChild(w.firstElementChild);
+    setupNew(doc);
+  }
+  markDirty(); renderLayers(); openEntry(id);
+}
+
+
+/* ===========================================================================
+   SITE PREVIEW EDITING
+   =========================================================================== */
+function showHome(){
+  view = 'home';
+  frame.style.display = ''; pane.style.display = 'none';
+  document.getElementById('bar-text').textContent = dirty ? 'unsaved changes' : 'index.html';
+  renderLayers(); homeControls();
+}
+
+function setupEditing(doc){
+  const st = doc.createElement('style');
+  st.id = 'ed-style';
+  st.textContent = `
+    [data-anim]{opacity:1 !important; transform:none !important;}
+    /* Link overlays would swallow clicks on the photo underneath */
+    .tile-link{pointer-events:none !important;}
+    .ed-text:hover{outline:1px dashed rgba(140,168,122,.85); outline-offset:3px; cursor:text;}
+    .ed-text:focus{outline:2px solid #8CA87A; outline-offset:3px;}
+    .ed-img{cursor:pointer;}
+    .ed-img:hover,.ed-img.sel{outline:2px solid #8CA87A; outline-offset:2px;}
+    .ed-block{position:relative;}
+    .ed-block.ed-hover{outline:1px solid rgba(140,168,122,.65); outline-offset:8px;}
+    .ed-block.sel{outline:2px solid #8CA87A; outline-offset:8px;}
+    #ed-tools{position:absolute; z-index:9999; display:none; gap:2px; background:#152019;
+      border:1px solid rgba(231,226,208,.3); border-radius:7px; padding:3px;
+      box-shadow:0 4px 16px rgba(0,0,0,.45);}
+    #ed-tools button{background:none; border:none; color:#E7E2D0; cursor:pointer;
+      font:600 11px/1 Montserrat,sans-serif; padding:6px 8px; border-radius:4px;}
+    #ed-tools button:hover{background:rgba(231,226,208,.16);}
+    #ed-tools button.del:hover{background:#C97B5A; color:#152019;}`;
+  doc.head.appendChild(st);
+
+  const tools = doc.createElement('div');
+  tools.id = 'ed-tools';
+  tools.innerHTML = ['up:↑','down:↓','dup:Duplicate','open:Open','del:Delete']
+    .map(x => { const [a,l] = x.split(':');
+      return `<button data-act="${a}" class="${a === 'del' ? 'del' : ''}">${l}</button>`; }).join('');
+  doc.body.appendChild(tools);
+
+  tools.onclick = e => {
+    const act = e.target.dataset.act, el = tools._t;
+    if (!act || !el) return;
+    if (act === 'up'   && el.previousElementSibling) el.parentNode.insertBefore(el, el.previousElementSibling);
+    if (act === 'down' && el.nextElementSibling)     el.parentNode.insertBefore(el.nextElementSibling, el);
+    if (act === 'open'){
+      const id = el.dataset.entry;
+      return id ? openEntry(id) : alert('This block has no page of its own.');
+    }
+    if (act === 'dup'){
+      const c = el.cloneNode(true);
+      // A duplicate needs its own entry, or both cards open the same page.
+      if (c.dataset.entry){
+        const src = db.entries[c.dataset.entry];
+        const nid = uid(src.type === 'note' ? 'note' : 'gal');
+        db.entries[nid] = JSON.parse(JSON.stringify(src));
+        db.entries[nid].title += ' (copy)';
+        c.dataset.entry = nid;
+        c.querySelectorAll('a[href^="entry.html"]').forEach(a => a.href = 'entry.html?id=' + nid);
+        renderLayers();
+      }
+      el.parentNode.insertBefore(c, el.nextSibling);
+    }
+    if (act === 'del'){
+      if (!confirm('Delete this block? Its page is deleted too.')) return;
+      if (el.dataset.entry){ delete db.entries[el.dataset.entry]; renderLayers(); }
+      el.remove(); tools.style.display = 'none'; selBlock = null; homeControls();
+    }
+    setupNew(doc); markDirty();
+  };
+
+  setupNew(doc);
+
+  doc.addEventListener('click', e => {
+    const a = e.target.closest('a');
+    if (a) e.preventDefault();            // never navigate away mid-edit
+  }, true);
+  doc.getElementById('contact-form')?.addEventListener('submit', e => e.preventDefault(), true);
+}
+
+/* Arm anything newly added or duplicated. */
+function setupNew(doc){
+  doc.querySelectorAll(TEXT_SEL).forEach(el => {
+    if (el.closest('[data-view]') || el.classList.contains('ed-text')) return;
+    el.classList.add('ed-text');
+    el.contentEditable = 'true';
+    el.addEventListener('input', () => {
+      markDirty();
+      // Keep a card's title in step with its entry record.
+      const b = el.closest('[data-entry]');
+      if (b && el.tagName === 'H3' && db.entries[b.dataset.entry]){
+        db.entries[b.dataset.entry].title = el.textContent.trim();
+        renderLayers();
+      }
+    });
+  });
+
+  doc.querySelectorAll('img, .placeholder-img, .about-portrait').forEach(el => {
+    if (el.classList.contains('ed-img') || el.closest('#ed-tools')) return;
+    el.classList.add('ed-img');
+    el.addEventListener('click', e => {
+      e.preventDefault(); e.stopPropagation();
+      selectImage(el, doc);
+    });
+  });
+
+  const tools = doc.getElementById('ed-tools');
+  doc.querySelectorAll(BLOCK_SEL).forEach(el => {
+    if (el.classList.contains('ed-block')) return;
+    el.classList.add('ed-block');
+    el.addEventListener('mouseenter', () => {
+      doc.querySelectorAll('.ed-hover').forEach(x => x.classList.remove('ed-hover'));
+      el.classList.add('ed-hover');
+      tools._t = el; tools.style.display = 'flex';
+      const r = el.getBoundingClientRect();
+      tools.style.top  = (r.top + doc.defaultView.scrollY - 34) + 'px';
+      tools.style.left = (r.left + doc.defaultView.scrollX) + 'px';
+    });
+    el.addEventListener('click', e => {
+      if (e.target.closest('.ed-text') || e.target.closest('.ed-img')) return;
+      doc.querySelectorAll('.ed-block.sel').forEach(x => x.classList.remove('sel'));
+      el.classList.add('sel'); selBlock = el; selImg = null; homeControls();
+    });
+  });
+}
+
+function selectImage(el, doc){
+  doc.querySelectorAll('.ed-img.sel').forEach(x => x.classList.remove('sel'));
+  el.classList.add('sel');
+  selImg = el; selBlock = el.closest('.ed-block') || null;
+  homeControls();
+}
+
+
+/* ===========================================================================
+   CONTEXTUAL CONTROLS — site view
+   =========================================================================== */
+function homeControls(){
+  const animOpts = a => ANIMS.map(([l, v]) =>
+    `<option value="${v}" ${a === v ? 'selected' : ''}>${l}</option>`).join('');
+
+  let html = `<div class="group"><h2>Add to the site</h2>
+    <div class="row">
+      <button class="btn" data-add="gallery">Collection</button>
+      <button class="btn" data-add="note">Post</button>
+    </div>
+    <div class="row">
+      <button class="btn" data-add="cred">Background</button>
+      <button class="btn" data-add="row">About block</button>
+    </div>
+  </div>`;
+
+  if (selImg){
+    const st = selImg.getAttribute('style') || '';
+    const curAR = (st.match(/aspect-ratio:\s*([^;]+)/) || [,''])[1].trim();
+    const pos = (st.match(/object-position:\s*([^;]+)/) || [,'50% 50%'])[1].trim();
+    const [px, py] = pos.split(/\s+/);
+    html += `<div class="group"><h2>Photo</h2>
+      <button class="btn" data-img="replace">Replace photo…</button>
+      <label class="field">Shape</label>
+      <select class="field" data-img="ar">
+        ${AR.map(([l, v]) => `<option value="${v}" ${curAR === v ? 'selected' : ''}>${l}</option>`).join('')}
+      </select>
+      <label class="field">Crop across — ${px}</label>
+      <input class="field" type="range" min="0" max="100" value="${parseInt(px) || 50}" data-img="x">
+      <label class="field">Crop down — ${py}</label>
+      <input class="field" type="range" min="0" max="100" value="${parseInt(py) || 50}" data-img="y">
+      <p class="hint">Pick a shape first, then slide to choose what stays in frame.</p>
+    </div>`;
+  }
+
+  if (selBlock){
+    const e = selBlock.dataset.entry ? db.entries[selBlock.dataset.entry] : null;
+    html += `<div class="group"><h2>Selected block</h2>
+      <label class="field">Animate on scroll</label>
+      <select class="field" data-blk="anim">${animOpts(selBlock.dataset.anim || '')}</select>
+      <label class="field">Text alignment</label>
+      <div class="row">
+        ${['left','center','right'].map(a =>
+          `<button class="btn" data-align="${a}">${a}</button>`).join('')}
+      </div>
+      <div class="row">
+        <button class="btn" data-blk="up">Move up</button>
+        <button class="btn" data-blk="down">Move down</button>
+      </div>
+      ${e ? `<button class="btn primary" data-blk="open">Open its page</button>` : ''}
+      <button class="btn danger" data-blk="del">Delete block</button>
+    </div>`;
+  }
+
+  if (!selImg && !selBlock){
+    html += `<div class="group"><h2>Selection</h2>
+      <p class="sel-none">Click a photo to crop it, or click a section to animate, move or delete it.</p></div>`;
+  }
+
+  html += `<div class="group"><h2>Site links</h2>
+    <label class="field">Contact email</label>
+    <input class="field" id="in-email" value="${esc(db.site?.email || '')}">
+    <label class="field">Instagram URL</label>
+    <input class="field" id="in-ig" value="${esc(db.site?.instagram || '')}">
+  </div>
+  <div class="group"><h2>How to use</h2>
+    <p class="hint"><b>Text</b> — click and type.<br>
+    <b>Photos</b> — click to select, then crop.<br>
+    <b>Blocks</b> — hover for move, duplicate, open and delete.<br>
+    <b>Pages</b> — the rail on the left.</p>
+  </div>`;
+
+  ctx.innerHTML = html;
+  wireHomeControls();
+}
+
+function wireHomeControls(){
+  const doc = frame.contentDocument;
+
+  ctx.querySelectorAll('[data-add]').forEach(b => b.onclick = () => addSimple(b.dataset.add));
+
+  ctx.querySelector('[data-img="replace"]')?.addEventListener('click',
+    () => pickMedia(f => applyPhoto(f, doc)));
+
+  const styleSet = (el, prop, val) => {
+    const s = (el.getAttribute('style') || '')
+      .split(';').map(x => x.trim()).filter(x => x && !x.startsWith(prop + ':'));
+    if (val) s.push(`${prop}:${val}`);
+    el.setAttribute('style', s.join('; '));
+  };
+
+  ctx.querySelector('[data-img="ar"]')?.addEventListener('change', e => {
+    styleSet(selImg, 'aspect-ratio', e.target.value);
+    if (e.target.value && !/object-position/.test(selImg.getAttribute('style') || ''))
+      styleSet(selImg, 'object-position', '50% 50%');
+    markDirty(); homeControls();
+  });
+
+  ['x','y'].forEach(axis => {
+    ctx.querySelector(`[data-img="${axis}"]`)?.addEventListener('input', e => {
+      const st = selImg.getAttribute('style') || '';
+      let [px, py] = ((st.match(/object-position:\s*([^;]+)/) || [,'50% 50%'])[1]).trim().split(/\s+/);
+      if (axis === 'x') px = e.target.value + '%'; else py = e.target.value + '%';
+      styleSet(selImg, 'object-position', `${px} ${py}`);
+      markDirty();
+    });
+  });
+
+  ctx.querySelector('[data-blk="anim"]')?.addEventListener('change', e => {
+    if (e.target.value) selBlock.dataset.anim = e.target.value;
+    else selBlock.removeAttribute('data-anim');
+    markDirty();
+  });
+
+  ctx.querySelectorAll('[data-align]').forEach(b => b.onclick = () => {
+    selBlock.style.textAlign = b.dataset.align; markDirty();
+  });
+
+  ctx.querySelectorAll('[data-blk]').forEach(b => b.onclick = () => {
+    const a = b.dataset.blk, el = selBlock;
+    if (a === 'up'   && el.previousElementSibling) el.parentNode.insertBefore(el, el.previousElementSibling);
+    if (a === 'down' && el.nextElementSibling)     el.parentNode.insertBefore(el.nextElementSibling, el);
+    if (a === 'open' && el.dataset.entry) return openEntry(el.dataset.entry);
+    if (a === 'del'){
+      if (!confirm('Delete this block? Its page is deleted too.')) return;
+      if (el.dataset.entry){ delete db.entries[el.dataset.entry]; renderLayers(); }
+      el.remove(); selBlock = null; selImg = null; homeControls();
+    }
+    markDirty();
+  });
+
+  document.getElementById('in-email')?.addEventListener('change', e => {
+    const v = e.target.value.trim(); if (!v) return;
+    db.site.email = v;
+    doc.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+      a.setAttribute('href', 'mailto:' + v); a.textContent = v;
+    });
+    markDirty();
+  });
+  document.getElementById('in-ig')?.addEventListener('change', e => {
+    const v = e.target.value.trim(); if (!v) return;
+    db.site.instagram = v;
+    const ig = doc.querySelector('.footer-links a[href]');
+    if (ig) ig.setAttribute('href', v);
+    markDirty();
+  });
+}
+
+function addSimple(kind){
+  if (kind === 'gallery' || kind === 'note') return newEntry(kind);
+  const doc = frame.contentDocument;
+  const T = {
+    cred:{sel:'.cred-list', html:`<div class="cred">
+  <h3>Qualification or course name</h3>
+  <p>Institution, city<br>One line of detail.</p>
+</div>`},
+    row:{sel:'.about-rows', html:`<div class="about-row">
+  <span class="label">Section title</span>
+  <div><p>Write the text for this section here.</p></div>
+</div>`}
+  }[kind];
+  const host = doc.querySelector(T.sel);
+  if (!host) return setStatus('Could not find ' + T.sel, 'warn');
+  const w = doc.createElement('div'); w.innerHTML = T.html.trim();
+  const node = w.firstElementChild;
+  host.appendChild(node);
+  doc.querySelector('nav.links button[data-view="about"]')?.click();
+  setupNew(doc); node.scrollIntoView({block:'center', behavior:'smooth'});
+  markDirty(); setStatus('Added a block.', 'ok');
+}
+
+/* Replace a cover photo in the site preview. */
+async function applyPhoto(file, doc){
+  const path = await stageMedia(file);
+  let img = selImg;
+  if (img.tagName !== 'IMG'){
+    const n = doc.createElement('img');
+    n.className = img.className.replace(/\bed-img\b/, '').replace(/\bplaceholder-img\b/, '').trim();
+    n.alt = '';
+    img.replaceWith(n);
+    n.classList.add('ed-img');
+    n.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); selectImage(n, doc); });
+    img = n; selImg = n;
+  }
+  img.dataset.edSrc = path;
+  img.src = URL.createObjectURL(file);
+  const blk = img.closest('[data-entry]');
+  if (blk && db.entries[blk.dataset.entry]) db.entries[blk.dataset.entry].cover = path;
+  markDirty(); homeControls();
+}
+
+
+/* ===========================================================================
+   MEDIA HANDLING
+   Files are written into assets/ right away when a folder is connected,
+   otherwise they queue up and go out with Save.
+   =========================================================================== */
+function pickMedia(cb, accept = 'image/*,video/*'){
+  const i = document.createElement('input');
+  i.type = 'file'; i.accept = accept; i.multiple = true;
+  i.onchange = () => { [...i.files].forEach(cb); };
+  i.click();
+}
+
+async function stageMedia(file){
+  const name = file.name.toLowerCase().replace(/[^a-z0-9.\-]+/g, '-');
+  const path = 'assets/' + name;
+  if (dirHandle){
+    try{
+      const a = await dirHandle.getDirectoryHandle('assets', {create:true});
+      const fh = await a.getFileHandle(name, {create:true});
+      const w = await fh.createWritable(); await w.write(file); await w.close();
+      setStatus('Wrote ' + path, 'ok');
+    }catch(err){ setStatus('Could not write ' + path + ': ' + err.message, 'warn'); }
+  }else{
+    pending.push({name, file});
+    setStatus(name + ' will go out with Save.', '');
+  }
+  return path;
+}
+
+/* Blob previews so newly added media shows before it exists on disk. */
+const previews = {};
+const preview = p => previews[p] || p;
+
+
+/* ===========================================================================
+   ENTRY EDITOR — collections and blog posts
+   =========================================================================== */
+function openEntry(id){
+  view = id; selBlock = null; selImg = null; selFigure = null;
+  frame.style.display = 'none'; pane.style.display = 'block';
+  const e = db.entries[id];
+  document.getElementById('bar-text').textContent =
+    (e.type === 'note' ? 'post: ' : 'collection: ') + (e.title || id);
+  renderLayers();
+  (e.type === 'note' ? renderPostEditor : renderCollectionEditor)(id, e);
+}
+
+function entryMetaControls(id, e){
+  const isNote = e.type === 'note';
+  ctx.innerHTML = `
+    <div class="group"><h2>${isNote ? 'Post' : 'Collection'} details</h2>
+      <label class="field">Title</label>
+      <input class="field" data-m="title" value="${esc(e.title)}">
+      ${isNote ? `
+      <label class="field">Category</label>
+      <input class="field" data-m="category" value="${esc(e.category || '')}">
+      <label class="field">Date</label>
+      <input class="field" type="date" data-m="date" value="${esc(e.date || '')}">`
+      : `<label class="field">Year</label>
+      <input class="field" data-m="year" value="${esc(e.year || '')}">`}
+      <label class="field">Short description</label>
+      <textarea class="field" data-m="desc">${esc(e.desc || '')}</textarea>
+    </div>
+    <div class="group"><h2>Content</h2>
+      ${isNote
+        ? `<button class="btn" data-act="add-fig">Add photo or video…</button>
+           <p class="hint">Click an attachment in the post to resize or remove it.</p>`
+        : `<button class="btn" data-act="add-media">Add photos or videos…</button>
+           <p class="hint">Media packs itself — tall and wide sit together. “Full width” breaks across the page.</p>`}
+    </div>
+    <div class="group"><h2>Page</h2>
+      <button class="btn" data-act="back">← Back to the site</button>
+      <button class="btn danger" data-act="del-entry">Delete this ${isNote ? 'post' : 'collection'}</button>
+    </div>`;
+
+  ctx.querySelectorAll('[data-m]').forEach(inp => inp.addEventListener('input', () => {
+    e[inp.dataset.m] = inp.value;
+    markDirty(); renderLayers();
+    if (inp.dataset.m === 'title') syncCardTitle(id, inp.value);
+  }));
+
+  ctx.querySelector('[data-act="back"]').onclick = showHome;
+  ctx.querySelector('[data-act="del-entry"]').onclick = () => {
+    if (!confirm('Delete this page and its card on the site?')) return;
+    frame.contentDocument.querySelector(`[data-entry="${id}"]`)?.remove();
+    delete db.entries[id];
+    markDirty(); showHome();
+  };
+  ctx.querySelector('[data-act="add-media"]')?.addEventListener('click',
+    () => pickMedia(async f => {
+      const p = await stageMedia(f);
+      previews[p] = URL.createObjectURL(f);
+      e.media.push({src:p, orient:'h', caption:'', alt:'', ar:'', pos:'50% 50%'});
+      markDirty(); renderCollectionEditor(id, e); renderLayers();
+    }));
+  ctx.querySelector('[data-act="add-fig"]')?.addEventListener('click',
+    () => pickMedia(async f => {
+      const p = await stageMedia(f);
+      previews[p] = URL.createObjectURL(f);
+      insertFigure(p);
+    }));
+}
+
+/* Keep the card on the main site showing the same title as its page. */
+function syncCardTitle(id, title){
+  const h = frame.contentDocument?.querySelector(`[data-entry="${id}"] h3`);
+  if (h) h.textContent = title;
+}
+
+/* ---------- Collection ---------- */
+function renderCollectionEditor(id, e){
+  entryMetaControls(id, e);
+  pane.innerHTML = `
+    <h2>${esc(e.title)}</h2>
+    <p class="kind">Collection · ${(e.media || []).length} item(s)</p>
+    <div class="pane-grid" id="mgrid"></div>`;
+
+  const grid = document.getElementById('mgrid');
+  if (!e.media.length){
+    grid.innerHTML = `<p class="sel-none">No media yet — use “Add photos or videos” on the left.</p>`;
+    return;
+  }
+
+  grid.innerHTML = e.media.map((m, i) => {
+    const src = preview(m.src);
+    const vid = /\.(mp4|webm|mov|m4v)$/i.test(m.src);
+    return `<div class="media-card">
+      ${vid ? `<video class="thumb" src="${esc(src)}" muted></video>`
+            : `<img class="thumb" src="${esc(src)}" alt="">`}
+      <div class="meta">
+        <button data-i="${i}" data-o=""     class="${m.orient !== 'full' ? 'on' : ''}">Normal</button>
+        <button data-i="${i}" data-o="full" class="${m.orient === 'full' ? 'on' : ''}">Full width</button>
+        <button data-i="${i}" data-mv="-1">←</button>
+        <button data-i="${i}" data-mv="1">→</button>
+        <button data-i="${i}" data-rm="1" class="del">✕</button>
+        <select data-i="${i}" data-ar="1">
+          ${AR.map(([l, v]) => `<option value="${v}" ${(m.ar || '') === v ? 'selected' : ''}>${l}</option>`).join('')}
+        </select>
+        <input data-i="${i}" data-cap="1" placeholder="caption" value="${esc(m.caption || '')}">
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.onclick = ev => {
+    const b = ev.target.closest('button'); if (!b) return;
+    const i = +b.dataset.i;
+    if (b.dataset.o !== undefined) e.media[i].orient = b.dataset.o;
+    if (b.dataset.rm) e.media.splice(i, 1);
+    if (b.dataset.mv){
+      const j = i + (+b.dataset.mv);
+      if (j >= 0 && j < e.media.length) [e.media[i], e.media[j]] = [e.media[j], e.media[i]];
+    }
+    markDirty(); renderCollectionEditor(id, e); renderLayers();
+  };
+  grid.oninput = ev => {
+    const t = ev.target, i = +t.dataset.i;
+    if (t.dataset.cap){ e.media[i].caption = t.value; markDirty(); }
+    if (t.dataset.ar){ e.media[i].ar = t.value; markDirty(); }
+  };
+  grid.onchange = grid.oninput;
+}
+
+/* ---------- Blog post ---------- */
+function renderPostEditor(id, e){
+  entryMetaControls(id, e);
+  const body = (e.blocks || []).map(b => b.t === 'figure' ? figureHTML(b) : (b.html || '')).join('');
+
+  pane.innerHTML = `
+    <h2>${esc(e.title)}</h2>
+    <p class="kind">Blog post</p>
+    <div id="toolbar">
+      <button data-c="bold"><b>B</b></button>
+      <button data-c="italic"><i>I</i></button>
+      <button data-c="underline"><u>U</u></button>
+      <select data-block>
+        <option value="p">Paragraph</option>
+        <option value="h2">Heading</option>
+        <option value="h3">Subheading</option>
+        <option value="blockquote">Quote</option>
+      </select>
+      <button data-c="insertUnorderedList">• List</button>
+      <button data-c="insertOrderedList">1. List</button>
+      <input type="color" data-color value="#1E2E23" title="Text colour">
+      <button data-link>Link</button>
+      <button data-c="removeFormat">Clear</button>
+    </div>
+    <div id="composer" contenteditable="true">${body}</div>`;
+
+  const comp = document.getElementById('composer');
+  const save = () => { e.blocks = readComposer(comp); markDirty(); };
+  comp.addEventListener('input', save);
+
+  const tb = document.getElementById('toolbar');
+  tb.querySelectorAll('[data-c]').forEach(b => b.onclick = ev => {
+    ev.preventDefault(); comp.focus();
+    document.execCommand(b.dataset.c, false, null); save();
+  });
+  tb.querySelector('[data-block]').onchange = ev => {
+    comp.focus(); document.execCommand('formatBlock', false, ev.target.value); save();
+  };
+  tb.querySelector('[data-color]').oninput = ev => {
+    comp.focus(); document.execCommand('foreColor', false, ev.target.value); save();
+  };
+  tb.querySelector('[data-link]').onclick = ev => {
+    ev.preventDefault(); comp.focus();
+    const u = prompt('Link address:', 'https://');
+    if (u) document.execCommand('createLink', false, u);
+    save();
+  };
+
+  // Click an attachment to size or remove it.
+  comp.addEventListener('click', ev => {
+    const fig = ev.target.closest('figure');
+    comp.querySelectorAll('figure.sel').forEach(f => f.classList.remove('sel'));
+    selFigure = fig || null;
+    if (fig) fig.classList.add('sel');
+    figureControls(save);
+  });
+}
+
+const figureHTML = b => `<figure class="${b.w || ''}" contenteditable="false">
+  ${/\.(mp4|webm|mov|m4v)$/i.test(b.src)
+    ? `<video src="${esc(preview(b.src))}" data-src="${esc(b.src)}" controls></video>`
+    : `<img src="${esc(preview(b.src))}" data-src="${esc(b.src)}" alt="">`}
+  <figcaption contenteditable="true">${esc(b.caption || 'Caption')}</figcaption>
+</figure><p><br></p>`;
+
+function insertFigure(path){
+  const comp = document.getElementById('composer');
+  comp.focus();
+  document.execCommand('insertHTML', false, figureHTML({src:path, w:'', caption:'Caption'}));
+  const e = db.entries[view];
+  e.blocks = readComposer(comp);
+  markDirty();
+}
+
+function figureControls(save){
+  const old = document.getElementById('figctl');
+  if (old) old.remove();
+  if (!selFigure) return;
+  const d = document.createElement('div');
+  d.className = 'group'; d.id = 'figctl';
+  d.innerHTML = `<h2>Attachment</h2>
+    <div class="row">
+      ${[['w-narrow','Narrow'],['','Normal'],['w-wide','Wide']].map(([v, l]) =>
+        `<button class="btn" data-w="${v}">${l}</button>`).join('')}
+    </div>
+    <button class="btn danger" data-fig="del">Remove attachment</button>`;
+  ctx.appendChild(d);
+  d.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
+    selFigure.className = b.dataset.w ? b.dataset.w + ' sel' : 'sel';
+    save();
+  });
+  d.querySelector('[data-fig="del"]').onclick = () => {
+    selFigure.remove(); selFigure = null; d.remove(); save();
+  };
+}
+
+/* Walk the composer and turn it back into storable blocks. */
+function readComposer(comp){
+  const out = [];
+  let buf = '';
+  const flush = () => { if (buf.trim()){ out.push({t:'rich', html:buf}); buf = ''; } };
+  [...comp.children].forEach(node => {
+    if (node.tagName === 'FIGURE'){
+      flush();
+      const m = node.querySelector('img,video');
+      out.push({
+        t:'figure',
+        src: m?.dataset.src || m?.getAttribute('src') || '',
+        w: node.className.replace('sel', '').trim(),
+        caption: node.querySelector('figcaption')?.textContent.trim() || ''
+      });
+    }else{
+      buf += node.outerHTML;
+    }
+  });
+  flush();
+  return out;
+}
+
+
+/* ===========================================================================
+   EXPORT
+   =========================================================================== */
+function buildHtml(){
+  const doc = frame.contentDocument;
+  const root = doc.documentElement.cloneNode(true);
+  ['#ed-style','#ed-base','#ed-tools'].forEach(s => root.querySelector(s)?.remove());
+
+  root.querySelectorAll('[data-ed-src]').forEach(img => {
+    img.setAttribute('src', img.dataset.edSrc);
+    img.removeAttribute('data-ed-src');
+  });
+  root.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+  root.querySelectorAll('.ed-text,.ed-img,.ed-block,.ed-hover,.sel,.cover-link').forEach(el => {
+    el.classList.remove('ed-text','ed-img','ed-block','ed-hover','sel','cover-link');
+    if (!el.classList.length) el.removeAttribute('class');
+  });
+  root.querySelectorAll('[style]').forEach(el => {
+    if (!el.getAttribute('style').trim()) el.removeAttribute('style');
+  });
+
+  // The site must always open on Home, whichever page was showing in the editor.
+  root.querySelectorAll('section.view').forEach(v => v.classList.toggle('active', v.id === 'home'));
+  root.querySelectorAll('nav.links button').forEach(b =>
+    b.classList.toggle('active', b.dataset.view === 'home'));
+
+  let html = '<!DOCTYPE html>\n' + root.outerHTML + '\n';
+  if (db.site?.email) html = html.replace(/mailto:[^?"'`\s]+/g, 'mailto:' + db.site.email);
+  return html;
+}
+
+
+/* ===========================================================================
+   SAVE — folder, GitHub, or download
+   =========================================================================== */
+document.getElementById('btn-folder').onclick = async () => {
+  if (!window.showDirectoryPicker)
+    return setStatus('This browser has no folder access. Use GitHub, or Save to download the files.', 'warn');
+  try{
+    dirHandle = await window.showDirectoryPicker({mode:'readwrite'});
+    await dirHandle.getFileHandle('index.html');
+    gh = null;
+    setStatus('Folder connected. Save writes straight to disk.', 'ok');
+  }catch(err){
+    dirHandle = null;
+    if (err.name !== 'AbortError') setStatus('Pick the site folder itself — the one holding index.html.', 'warn');
+  }
+};
+
+document.getElementById('btn-github').onclick = () => {
+  const repo = prompt('Repository, as owner/name:', gh ? `${gh.owner}/${gh.repo}` : '');
+  if (!repo || !repo.includes('/')) return;
+  const token = prompt('GitHub personal access token.\n\nMake one at github.com/settings/tokens — a fine-grained token with Contents: read and write on this repo only.');
+  if (!token) return;
+  const branch = prompt('Branch:', 'main') || 'main';
+  const [owner, name] = repo.split('/');
+  gh = {owner, repo:name, branch, token:token.trim()};
+  dirHandle = null;
+  setStatus(`Connected to ${owner}/${name}. Save commits and Vercel redeploys.`, 'ok');
+};
+
+/* Commit one file through the GitHub contents API. */
+async function ghPut(path, contentB64, msg){
+  const url = `https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/${path}`;
+  const head = {Authorization:'Bearer ' + gh.token, Accept:'application/vnd.github+json'};
+  let sha;
+  const cur = await fetch(`${url}?ref=${gh.branch}`, {headers:head});
+  if (cur.ok) sha = (await cur.json()).sha;
+  const res = await fetch(url, {
+    method:'PUT', headers:{...head, 'Content-Type':'application/json'},
+    body: JSON.stringify({message:msg, content:contentB64, branch:gh.branch, ...(sha ? {sha} : {})})
+  });
+  if (!res.ok) throw new Error(path + ': ' + (await res.json()).message);
+}
+
+const b64 = str => btoa(String.fromCharCode(...new TextEncoder().encode(str)));
+const fileB64 = file => new Promise(res => {
+  const r = new FileReader();
+  r.onload = () => res(r.result.split(',')[1]);
+  r.readAsDataURL(file);
+});
+
+document.getElementById('btn-save').onclick = async () => {
+  const html = buildHtml();
+  const json = JSON.stringify(db, null, 2);
+
+  if (gh){
+    setStatus('Committing…', '');
+    try{
+      await ghPut('index.html', b64(html), 'Update site');
+      await ghPut('data/entries.json', b64(json), 'Update entries');
+      for (const {name, file} of pending)
+        await ghPut('assets/' + name, await fileB64(file), 'Add ' + name);
+      pending = [];
+      clean('Committed. Vercel will redeploy in a moment.');
+    }catch(err){ setStatus('GitHub said: ' + err.message, 'warn'); }
+    return;
+  }
+
+  if (dirHandle){
+    try{
+      await writeFile('index.html', html);
+      const d = await dirHandle.getDirectoryHandle('data', {create:true});
+      const fh = await d.getFileHandle('entries.json', {create:true});
+      const w = await fh.createWritable(); await w.write(json); await w.close();
+      clean('Saved to the folder.');
+    }catch(err){ setStatus('Save failed: ' + err.message, 'warn'); }
+    return;
+  }
+
+  download(new Blob([html], {type:'text/html'}), 'index.html');
+  download(new Blob([json], {type:'application/json'}), 'entries.json');
+  pending.forEach(({name, file}, i) => setTimeout(() => download(file, name), (i + 1) * 350));
+  const n = pending.length; pending = [];
+  clean(`Downloaded index.html, entries.json${n ? ` and ${n} media file(s)` : ''}. ` +
+        `index.html goes in the root, entries.json in data/, media in assets/.`);
+};
+
+async function writeFile(name, text){
+  const fh = await dirHandle.getFileHandle(name, {create:true});
+  const w = await fh.createWritable(); await w.write(text); await w.close();
+}
+function clean(msg){
+  dirty = false; dot.classList.remove('dirty');
+  document.getElementById('bar-text').textContent = view === 'home' ? 'index.html — saved' : 'saved';
+  setStatus(msg, 'ok');
+}
+function download(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+document.getElementById('btn-preview').onclick = () => {
+  window.open(view === 'home' ? 'index.html' : 'entry.html?id=' + view, '_blank');
+};
+document.getElementById('btn-reload').onclick = () => {
+  if (dirty && !confirm('Discard unsaved changes?')) return;
+  pending = []; boot();
+};
+window.addEventListener('beforeunload', e => { if (dirty){ e.preventDefault(); e.returnValue = ''; } });
+
+boot();
+</script>
+</body>
+</html>

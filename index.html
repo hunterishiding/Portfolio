@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hunter — photographer, videographer, creative</title>
+<meta name="description" content="Hunter — photography and video from Tegucigalpa, Honduras. Razorbill studio.">
+
+<!--
+  ============================================================================
+  HUNTER / razorbill.studio
+  Single-file static site. No build step, no dependencies, no frameworks.
+
+  HOW THIS FILE IS ORGANISED
+    1. CSS  — design tokens, then one block per page section
+    2. HTML — <header> nav, then one <section class="view"> per page
+    3. JS   — ~20 lines at the bottom that swap which section is visible
+
+  HOW THE NAVIGATION WORKS
+    Every page lives in this one file as a <section class="view" id="...">.
+    Only the section with class "active" is displayed. Any element with a
+    data-view="gallery" attribute switches to that section when clicked, so
+    footer links and in-page buttons work the same way as the nav.
+
+  ADDING NEW WORK
+    Search this file for the word "COPY" — every repeatable block is marked
+    with a comment telling you exactly what to duplicate.
+
+  IMAGES
+    All images live in the assets/ folder next to this file. To swap one out,
+    drop a new file into assets/ and change the src="" — nothing else.
+  ============================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800;900&amp;family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="icon" href="assets/avatar.png">
+
+<style>
+/* ===========================================================================
+   1. DESIGN TOKENS
+   Colours sampled directly from the Canva export so the site matches it.
+   Change a value here and it updates everywhere on the site.
+   =========================================================================== */
+:root{
+  --pine-deep:#152019;   /* nav bar, footer, darkest buttons */
+  --pine:#1E2E23;        /* hero + dark section backgrounds */
+  --ink:#071E0C;         /* the near-black green on the big CTA buttons */
+  --cream:#E7E2D0;       /* light section backgrounds, body text on dark */
+  --sand:#D9D2BB;        /* the wordmark colour; muted text on dark */
+
+  /* Libre Franklin is the open-source Franklin Gothic that Canva used for
+     the headlines. Montserrat is the same family Canva used for body text. */
+  --display:'Libre Franklin','Helvetica Neue',Arial,sans-serif;
+  --body:'Montserrat','Segoe UI',Helvetica,Arial,sans-serif;
+
+  --page:1180px;         /* max content width */
+  --radius:12px;
+}
+
+/* ---------- Reset + base ---------- */
+*{box-sizing:border-box;}
+html{background:var(--pine-deep);}
+body{
+  margin:0;
+  background:var(--cream);
+  color:var(--pine-deep);
+  font-family:var(--body);
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block; max-width:100%;}
+a{color:inherit; text-decoration:none;}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+
+/* Visible keyboard focus — do not remove, it is the only focus indicator. */
+:focus-visible{outline:2px solid var(--sand); outline-offset:3px; border-radius:4px;}
+
+/* Respect the OS "reduce motion" setting. */
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important; transition-duration:.01ms !important;}
+}
+
+.wrap{max-width:var(--page); margin:0 auto; padding:0 28px;}
+
+
+/* ===========================================================================
+   2. STICKY NAV
+   =========================================================================== */
+header{
+  position:sticky; top:0; z-index:50;
+  background:var(--pine-deep);
+}
+.nav-wrap{
+  max-width:var(--page); margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:24px; padding:14px 28px;
+}
+.nav-wrap .mark{height:26px; width:auto;}   /* the HUNTER wordmark, top left */
+
+nav.links{display:flex; gap:26px; flex-wrap:wrap;}
+nav.links button{
+  font-size:.92rem; color:var(--sand);
+  padding:2px 0; opacity:.72;
+  transition:opacity .2s ease;
+}
+nav.links button:hover{opacity:1;}
+nav.links button.active{opacity:1; font-weight:600; color:var(--cream);}
+
+
+/* ===========================================================================
+   3. PAGE SWITCHING
+   Only one .view is visible at a time — the JS at the bottom toggles .active.
+   =========================================================================== */
+section.view{display:none;}
+section.view.active{display:block;}
+
+
+/* ===========================================================================
+   4. HOME — hero
+   Dark green band: pixel avatar on the left, wordmark lockup on the right.
+   =========================================================================== */
+.hero{background:var(--pine); padding:6px 0 0; overflow:hidden;}
+.hero-inner{
+  max-width:var(--page); margin:0 auto;
+  display:grid; grid-template-columns:auto 1fr;
+  align-items:end; gap:20px; padding:0 28px;
+}
+/* Sits flush on the bottom edge of the green band, as in the Canva file */
+.hero-avatar{width:clamp(150px,20vw,250px); height:auto; align-self:end; margin-bottom:-6px;}
+.hero-copy{text-align:center; padding-bottom:42px;}
+.hero-copy .greeting{
+  font-family:var(--display); font-weight:800;
+  font-size:clamp(1.3rem,2.6vw,1.9rem);
+  color:var(--cream); margin:0 0 -.15em;
+}
+.hero-copy .wordmark{
+  width:clamp(240px,42vw,460px); height:auto; margin:0 auto;
+}
+.hero-copy .role{
+  font-size:clamp(.72rem,1.3vw,.86rem); font-weight:600;
+  color:var(--cream); margin:.4em 0 0; letter-spacing:.01em;
+}
+
+
+/* ===========================================================================
+   5. HOME — "Welcome to my world" + the photo grid (bento)
+   =========================================================================== */
+.welcome{background:var(--cream); padding:34px 0 46px;}
+.welcome-head{text-align:center; margin-bottom:22px;}
+.welcome-head h2{
+  font-family:var(--display); font-weight:800;
+  font-size:clamp(1.6rem,3.4vw,2.2rem);
+  color:var(--pine-deep); margin:0;
+}
+.welcome-head p{
+  font-size:.82rem; font-weight:700;
+  color:var(--pine-deep); margin:.3em 0 0;
+}
+
+/* Proportions taken from the Canva layout: a wide left column holding one
+   large card above two small ones, and a narrow tall card on the right. */
+.bento{display:grid; grid-template-columns:2.2fr 1fr; gap:16px; aspect-ratio:1.86;}
+.bento-left{display:grid; grid-template-rows:1.75fr 1fr; gap:16px;}
+.bento-left-row{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+
+.tile{
+  position:relative; overflow:hidden; min-height:0; min-width:0;
+  border:2px solid var(--pine-deep);
+  border-radius:var(--radius);
+  min-height:120px;
+}
+.tile img{width:100%; height:100%; object-fit:cover;}
+/* Caption sits bottom-left over the photo, with a soft scrim for legibility */
+.tile figcaption{
+  position:absolute; left:12px; bottom:10px; right:12px;
+  font-weight:700; color:#fff;
+  text-shadow:0 1px 6px rgba(0,0,0,.65);
+}
+.tile.lg figcaption{font-size:1.05rem;}
+.tile.sm figcaption{font-size:.78rem;}
+
+/* The full-width dark button under the grid */
+.btn-wide{
+  display:block; width:100%; margin-top:16px;
+  background:var(--ink); color:var(--cream);
+  border-radius:var(--radius);
+  padding:16px; font-weight:700; font-size:.95rem;
+  transition:background .2s ease;
+}
+.btn-wide:hover{background:var(--pine);}
+
+
+/* ===========================================================================
+   6. HOME — dark "shooting to editing" band with the software icons
+   =========================================================================== */
+.band{background:var(--pine-deep); padding:72px 0;}
+.band-inner{
+  display:grid; grid-template-columns:.8fr 1.2fr;
+  gap:56px; align-items:center;
+}
+/* The olive blob is a transparent PNG from the Canva file; the four app
+   icons are absolutely positioned on top of it in a 2x2. */
+.blob-stack{position:relative; width:100%; max-width:330px; margin:0 auto;}
+.blob-stack .blob{width:100%;}
+.icon-grid{
+  position:absolute; inset:0;
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:12px; place-content:center;
+  padding:0 24%;
+}
+.icon-grid img{width:100%; border-radius:12px;}
+
+.band-copy h2{
+  font-family:var(--display); font-weight:800;
+  font-size:clamp(1.7rem,3.5vw,2.45rem); line-height:1.12;
+  color:var(--cream); margin:0 0 16px;
+}
+.band-copy p{
+  font-size:.92rem; line-height:1.6; color:var(--cream);
+  max-width:52ch; margin:0 0 26px;
+}
+/* Cream button used on dark backgrounds */
+.btn-light{
+  display:block; width:100%; max-width:400px;
+  background:var(--sand); color:var(--pine-deep);
+  border-radius:8px; padding:13px;
+  font-weight:700; font-size:.88rem;
+  transition:background .2s ease;
+}
+.btn-light:hover{background:var(--cream);}
+
+
+/* ===========================================================================
+   7. HOME — "Come say hi." closing block
+   =========================================================================== */
+.sayhi{background:var(--cream); padding:70px 0 84px; text-align:center;}
+.sayhi h2{
+  font-family:var(--display); font-weight:800;
+  font-size:clamp(1.8rem,3.6vw,2.3rem);
+  color:var(--pine-deep); margin:0 0 14px;
+}
+.sayhi p{
+  font-size:.86rem; line-height:1.6; max-width:62ch;
+  margin:0 auto 26px; color:var(--pine-deep);
+}
+.btn-dark{
+  display:inline-block;
+  background:var(--ink); color:var(--cream);
+  border-radius:8px; padding:13px 46px;
+  font-weight:700; font-size:.9rem;
+  transition:background .2s ease;
+}
+.btn-dark:hover{background:var(--pine);}
+
+
+/* ===========================================================================
+   8. GALLERY
+   =========================================================================== */
+.gallery-page{background:var(--pine); min-height:80vh; padding:56px 0 90px;}
+.gallery-page h1{
+  font-family:var(--display); font-weight:900;
+  font-size:clamp(2.8rem,9vw,6.2rem); line-height:1;
+  color:var(--sand); margin:0 0 64px; text-align:center;
+  letter-spacing:-.02em;
+}
+.gallery-grid{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:60px 46px;
+}
+.g-item .year{
+  font-size:1.05rem; color:var(--cream); opacity:.85; display:block;
+}
+.g-item h3{
+  font-family:var(--display); font-weight:700;
+  font-size:1.08rem; color:var(--cream); margin:.1em 0 14px;
+}
+.g-item img,
+.g-item .placeholder-img{
+  width:100%; aspect-ratio:16/10; object-fit:cover;
+  border-radius:4px; background:rgba(231,226,208,.07);
+}
+/* Empty image slot. Delete the div and drop an <img> in its place. */
+.placeholder-img{
+  display:flex; align-items:center; justify-content:center;
+  border:1px dashed rgba(231,226,208,.35);
+  font-size:.75rem; color:rgba(231,226,208,.55);
+}
+.placeholder-img::after{content:'photo goes here';}
+.notes-page .placeholder-img{
+  border-color:rgba(21,32,25,.3); color:rgba(21,32,25,.5);
+}
+.g-item p{
+  font-size:.83rem; line-height:1.55;
+  color:var(--cream); opacity:.88; margin:14px 0 0;
+}
+
+
+/* ===========================================================================
+   9. ABOUT
+   =========================================================================== */
+.about-top{background:var(--pine); padding:52px 0 64px;}
+.about-top-inner{
+  max-width:var(--page); margin:0 auto; padding:0 28px;
+  display:grid; grid-template-columns:.95fr 1.05fr; gap:48px; align-items:start;
+}
+.about-portrait{
+  width:100%; max-width:400px; aspect-ratio:4/5; object-fit:cover;
+  background:rgba(231,226,208,.07); border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px dashed rgba(231,226,208,.35);
+  font-size:.78rem; color:rgba(231,226,208,.55);
+}
+.about-portrait:empty::after{content:'portrait goes here';}
+img.about-portrait{border:none;}
+/* Two label/text rows separated by hairline rules, matching the Canva page */
+.about-row{
+  display:grid; grid-template-columns:150px 1fr; gap:24px;
+  border-top:1px solid rgba(231,226,208,.45);
+  padding:16px 0 34px;
+}
+.about-row .label{
+  font-size:.72rem; font-weight:700; letter-spacing:.14em;
+  color:var(--cream); text-transform:uppercase;
+}
+.about-row p{
+  font-size:.87rem; line-height:1.62; color:var(--cream);
+  margin:0 0 12px; max-width:62ch;
+}
+.about-row p:last-child{margin-bottom:0;}
+
+.about-bottom{background:var(--cream); padding:70px 0 90px;}
+.about-bottom-inner{
+  display:grid; grid-template-columns:.85fr 1.15fr; gap:56px;
+}
+.about-bottom h2{
+  font-family:var(--display); font-weight:900;
+  font-size:clamp(2rem,4.5vw,3rem);
+  color:var(--pine); margin:0 0 20px;
+}
+.about-bottom .intro{font-size:.95rem; line-height:1.65; max-width:42ch; margin:0;}
+
+.cred{border-top:1px solid rgba(21,32,25,.5); padding:14px 0 22px;}
+.cred:last-child{border-bottom:1px solid rgba(21,32,25,.5);}
+.cred h3{font-size:.9rem; font-weight:700; margin:0 0 4px; color:var(--pine-deep);}
+.cred p{font-size:.85rem; line-height:1.5; margin:0; color:rgba(21,32,25,.78);}
+
+
+/* ===========================================================================
+   10. FIELD NOTES
+   =========================================================================== */
+.notes-page{background:var(--cream); padding:56px 0 90px; min-height:80vh;}
+.notes-page h1{
+  font-family:var(--display); font-weight:900;
+  font-size:clamp(2.2rem,5vw,3.2rem);
+  color:var(--pine); margin:0 0 44px;
+}
+.notes-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:56px 40px;}
+.note img,
+.note .placeholder-img{
+  width:100%; aspect-ratio:16/10; object-fit:cover;
+  background:rgba(21,32,25,.12); border-radius:2px;
+}
+.note h3{font-size:.95rem; font-weight:700; line-height:1.35; margin:16px 0 8px;}
+.note .source{
+  font-size:.72rem; font-weight:700; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--pine-deep); display:block;
+}
+.note p{font-size:.84rem; line-height:1.55; margin:12px 0 18px; color:rgba(21,32,25,.82);}
+.btn-outline{
+  display:inline-block;
+  border:1px solid rgba(21,32,25,.45); border-radius:6px;
+  padding:9px 24px; font-size:.84rem; background:transparent;
+  transition:background .2s ease,border-color .2s ease;
+}
+.btn-outline:hover{background:rgba(21,32,25,.07); border-color:var(--pine-deep);}
+
+
+/* ===========================================================================
+   11b. LINKS OUT TO ENTRY PAGES
+   Each gallery entry and field note has its own page at entry.html?id=...
+   The whole cover photo is clickable; the button underneath is the same link.
+   =========================================================================== */
+.tile-link{position:absolute; inset:0; z-index:2;}          /* covers a home tile */
+.tile-link:focus-visible{outline:2px solid var(--cream); outline-offset:-4px;}
+.g-item .cover-link,
+.note .cover-link{display:block; cursor:pointer;}
+.g-open{margin-top:14px; color:var(--cream); border-color:rgba(231,226,208,.45);}
+.g-open:hover{background:rgba(231,226,208,.1); border-color:var(--cream);}
+
+/* Any image the editor has given a crop keeps its framing on every screen. */
+img[style*="aspect-ratio"]{object-fit:cover; width:100%;}
+
+
+/* ===========================================================================
+   11c. SCROLL ANIMATIONS
+   Elements carrying data-anim start hidden and are revealed once when they
+   scroll into view. Remove the attribute to turn an animation off.
+   =========================================================================== */
+@media (prefers-reduced-motion:no-preference){
+  [data-anim]{opacity:0; transition:opacity .7s ease, transform .7s ease;}
+  [data-anim="fade"]     {}
+  [data-anim="up"]       {transform:translateY(26px);}
+  [data-anim="left"]     {transform:translateX(-26px);}
+  [data-anim="right"]    {transform:translateX(26px);}
+  [data-anim="zoom"]     {transform:scale(.94);}
+  [data-anim].shown{opacity:1; transform:none;}
+}
+
+
+/* ===========================================================================
+   11. CONTACT
+   =========================================================================== */
+.contact-page{background:var(--cream); padding:48px 0 90px; min-height:80vh;}
+.contact-inner{
+  display:grid; grid-template-columns:.75fr 1.25fr;
+  gap:48px; align-items:center;
+}
+.contact-avatar{width:100%; max-width:360px; margin:0 auto;}
+.contact-page h1{
+  font-family:var(--display); font-weight:900;
+  font-size:clamp(2.6rem,7vw,5rem); line-height:1.02;
+  color:var(--pine); margin:0 0 34px; letter-spacing:-.02em;
+}
+.contact-page textarea{
+  width:100%; min-height:250px; resize:vertical;
+  background:transparent; color:var(--pine-deep);
+  border:3px solid var(--pine); border-radius:14px;
+  padding:18px 20px; font-family:var(--body); font-size:.95rem;
+}
+.contact-page textarea::placeholder{color:rgba(21,32,25,.6);}
+.contact-page .btn-wide{margin-top:14px;}
+.contact-note{font-size:.8rem; margin:14px 0 0; color:rgba(21,32,25,.7);}
+.contact-note a{text-decoration:underline;}
+
+
+/* ===========================================================================
+   12. FOOTER
+   =========================================================================== */
+footer{background:var(--pine-deep); padding:18px 0;}
+.footer-inner{
+  max-width:var(--page); margin:0 auto; padding:0 28px;
+  display:flex; align-items:center; justify-content:space-between; gap:20px;
+}
+.footer-inner .mark{height:24px; width:auto;}
+.footer-links{display:flex; gap:30px;}
+.footer-links a,
+.footer-links button{
+  color:var(--sand); font-size:.88rem; text-decoration:underline;
+}
+
+
+/* ===========================================================================
+   13. RESPONSIVE
+   Two breakpoints: tablet collapses the 3-column grids, mobile stacks
+   everything into a single column.
+   =========================================================================== */
+@media (max-width:900px){
+  .gallery-grid,
+  .notes-grid{grid-template-columns:repeat(2,1fr); gap:44px 32px;}
+  .band-inner,
+  .about-top-inner,
+  .about-bottom-inner,
+  .contact-inner{grid-template-columns:1fr; gap:36px;}
+  .about-portrait{max-width:380px;}
+  .blob-stack{max-width:260px;}
+  .btn-light{max-width:none;}
+}
+
+@media (max-width:640px){
+  .wrap,
+  .nav-wrap,
+  .hero-inner,
+  .about-top-inner,
+  .footer-inner{padding-left:18px; padding-right:18px;}
+
+  .nav-wrap{flex-direction:column; align-items:flex-start; gap:10px;}
+  nav.links{gap:18px;}
+  nav.links button{font-size:.85rem;}
+
+  /* Hero: avatar above the wordmark instead of beside it */
+  .hero-inner{grid-template-columns:1fr; justify-items:center; gap:14px;}
+  .hero-avatar{width:150px; margin-bottom:0;}
+  .hero-copy{padding-bottom:32px;}
+
+  /* Photo grid: one card per row, tall basketball card first out of the way */
+  .bento{aspect-ratio:auto;}          /* must be reset, or the stacked tiles overflow */
+  .bento,
+  .bento-left,
+  .bento-left-row{grid-template-columns:1fr; grid-template-rows:auto;}
+  .tile{aspect-ratio:16/10;}
+  .tile.tall{aspect-ratio:3/4;}
+
+  .gallery-grid,
+  .notes-grid{grid-template-columns:1fr;}
+  .about-row{grid-template-columns:1fr; gap:10px;}
+  .footer-inner{flex-direction:column; align-items:flex-start; gap:14px;}
+  .footer-links{gap:22px;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===========================================================================
+     STICKY NAV
+     Each button's data-view value must match the id of a <section> below.
+     =========================================================================== -->
+<header>
+  <div class="nav-wrap">
+    <button data-view="home" aria-label="Hunter — go to home">
+      <img class="mark" src="assets/hunter-wordmark.png" alt="Hunter">
+    </button>
+    <nav class="links">
+      <button data-view="home" class="active">home</button>
+      <button data-view="gallery">gallery</button>
+      <button data-view="about">about</button>
+      <button data-view="notes">field notes</button>
+      <button data-view="contact">contact</button>
+    </nav>
+  </div>
+</header>
+
+
+<!-- ===========================================================================
+     PAGE: HOME
+     =========================================================================== -->
+<section class="view active" id="home">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-inner">
+      <img class="hero-avatar" src="assets/avatar.png" alt="Pixel-art portrait of Hunter holding a camera">
+      <div class="hero-copy">
+        <p class="greeting">Hey, I'm</p>
+        <img class="wordmark" src="assets/hunter-wordmark.png" alt="Hunter">
+        <p class="role">photographer, videographer, creative</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured photo grid -->
+  <div class="welcome">
+    <div class="wrap">
+      <div class="welcome-head">
+        <h2>Welcome to my world</h2>
+        <p>click on anything and enjoy</p>
+      </div>
+
+      <div class="bento">
+        <div class="bento-left">
+
+          <!-- TILE — the large one. Swap src and figcaption to change it. -->
+          <figure class="tile lg" data-entry="tile-xv" style="margin:0">
+            <a class="tile-link" href="entry.html?id=tile-xv" aria-label="Open collection"></a>
+            <img src="assets/xv-del-cam.jpg" alt="XV del CAM — crowd on a walkway above a piñata">
+            <figcaption>XV del CAM</figcaption>
+          </figure>
+
+          <div class="bento-left-row">
+            <!-- TILE — small. COPY one of these two <figure> blocks to add another. -->
+            <figure class="tile sm" data-entry="tile-ai" style="margin:0">
+              <a class="tile-link" href="entry.html?id=tile-ai" aria-label="Open collection"></a>
+            <img src="assets/ai-vs-machine.jpg" alt="Boxer resting in the corner of a ring during a shoot">
+              <figcaption>AI vs Machine</figcaption>
+            </figure>
+
+            <figure class="tile sm" data-entry="tile-sv" style="margin:0">
+              <a class="tile-link" href="entry.html?id=tile-sv" aria-label="Open collection"></a>
+            <img src="assets/el-salvador.jpg" alt="Pigeons taking flight outside a church in El Salvador">
+              <figcaption>El Salvador</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <!-- TILE — the tall right-hand one -->
+        <figure class="tile lg tall" data-entry="tile-bb" style="margin:0">
+          <a class="tile-link" href="entry.html?id=tile-bb" aria-label="Open collection"></a>
+            <img src="assets/basketball.jpg" alt="Basketball player driving to the basket mid-air">
+          <figcaption>Basketball</figcaption>
+        </figure>
+      </div>
+
+      <button class="btn-wide" data-view="gallery">Click here to see all my work</button>
+    </div>
+  </div>
+
+  <!-- Dark band: software icons + intro -->
+  <div class="band">
+    <div class="wrap band-inner">
+      <div class="blob-stack">
+        <img class="blob" src="assets/blob.png" alt="">
+        <div class="icon-grid">
+          <img src="assets/icon-premiere.png" alt="Adobe Premiere Pro">
+          <img src="assets/icon-artlist.png" alt="Artlist">
+          <img src="assets/icon-davinci.png" alt="DaVinci Resolve">
+          <img src="assets/icon-photoshop.png" alt="Adobe Photoshop">
+        </div>
+      </div>
+
+      <div class="band-copy">
+        <h2>From shooting to editing,<br>and everything in between.</h2>
+        <p>Most of what I create starts as an excuse to grab a camera, then it turns into something I want to keep telling people about.</p>
+        <button class="btn-light" data-view="about">Read more about me</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Closing call to action -->
+  <div class="sayhi">
+    <div class="wrap">
+      <h2>Come say hi.</h2>
+      <p>Open to freelance work, collaborations, and anyone who wants to talk about cameras, ecosystems and a bunch of other stuff.</p>
+      <button class="btn-dark" data-view="contact">Get in Touch</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===========================================================================
+     PAGE: GALLERY
+     Placeholder entries — replace the year, title, image and description in
+     each block with a real project.
+     =========================================================================== -->
+<section class="view" id="gallery">
+  <div class="gallery-page">
+    <div class="wrap">
+      <h1>This is my work.</h1>
+
+      <div class="gallery-grid">
+
+        <!-- GALLERY ITEM — copy this whole <article> block to add a new one.
+             Replace the <div class="placeholder-img"> with:
+             <img src="assets/your-photo.jpg" alt="Describe the photo"> -->
+        <article class="g-item" data-entry="gal-1">
+          <span class="year">2026</span>
+          <h3>Basketball Copa Jaguar</h3>
+          <div class="placeholder-img"></div>
+          <p>An idea that turned into reality exactly how I imagined it.</p>
+          <a class="btn-outline g-open" href="entry.html?id=gal-1">View collection</a>
+        </article>
+        <!-- END GALLERY ITEM -->
+
+        <article class="g-item" data-entry="gal-2">
+          <span class="year">2026</span>
+          <h3>X Aniversario de Gastronomía</h3>
+          <div class="placeholder-img"></div>
+          <p>One-line description of the shoot — what it was, where it was, and what you were going for.</p>
+          <a class="btn-outline g-open" href="entry.html?id=gal-2">View collection</a>
+        </article>
+
+        <article class="g-item" data-entry="gal-3">
+          <span class="year">2026</span>
+          <h3>XV Aniversario del CAM</h3>
+          <div class="placeholder-img"></div>
+          <p>One-line description of the shoot — what it was, where it was, and what you were going for.</p>
+          <a class="btn-outline g-open" href="entry.html?id=gal-3">View collection</a>
+        </article>
+
+        <article class="g-item" data-entry="gal-4">
+          <span class="year">2026</span>
+          <h3>El Salvador</h3>
+          <div class="placeholder-img"></div>
+          <p>Current challenge: Capture what's most relevant on this family trip</p>
+          <a class="btn-outline g-open" href="entry.html?id=gal-4">View collection</a>
+        </article>
+
+        <article class="g-item" data-entry="gal-5">
+          <span class="year">2026</span>
+          <h3>El Picacho</h3>
+          <div class="placeholder-img"></div>
+          <p>Highlights from a Youth Group Activity</p>
+          <a class="btn-outline g-open" href="entry.html?id=gal-5">View collection</a>
+        </article><article class="g-item" data-entry="gal-6">
+          <span class="year">2025</span>
+          <h3>AI vs Machine</h3>
+          <img alt="" src="assets/dsc02404.jpg">
+          <p>When you're on-set at a short film... Why not become BTS photographer?</p>
+          <a class="btn-outline g-open" href="entry.html?id=gal-6">View collection</a>
+        </article>
+
+        
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===========================================================================
+     PAGE: ABOUT
+     All text here is placeholder. Write your own — nothing below is real.
+     =========================================================================== -->
+<section class="view" id="about">
+
+  <div class="about-top">
+    <div class="about-top-inner">
+      <!-- Swap this for a real portrait:
+           <img class="about-portrait" src="assets/portrait.jpg" alt="Hunter"> -->
+      <div class="about-portrait"></div>
+
+      <div>
+      <div class="about-rows">
+        <!-- ABOUT ROW — copy this block to add another labelled section -->
+        <div class="about-row">
+          <span class="label">Bio</span>
+          <div>
+            <p>Short bio goes here. A paragraph or two about who you are, where you're based, and what kind of work you do.</p>
+            <p>Second paragraph if you want one — how you got into photography and video, and what you're working toward.</p>
+          </div>
+        </div>
+        <!-- END ABOUT ROW -->
+
+        <div class="about-row">
+          <span class="label">My approach</span>
+          <div>
+            <p>How you like to work. What you look for in a shoot, how you handle a brief, what a client can expect from you.</p>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-bottom">
+    <div class="wrap about-bottom-inner">
+      <div>
+        <h2>Background</h2>
+        <p class="intro">A short intro to the list on the right — studies, training, or anything else worth listing.</p>
+      </div>
+
+      <div class="cred-list">
+        <!-- CREDENTIAL — copy this block to add a new entry to the list -->
+        <div class="cred">
+          <h3>Qualification or course name</h3>
+          <p>Institution, city<br>One line of detail — focus, specialisation, or dates.</p>
+        </div>
+        <!-- END CREDENTIAL -->
+
+        <div class="cred">
+          <h3>Qualification or course name</h3>
+          <p>Institution, city<br>One line of detail — focus, specialisation, or dates.</p>
+        </div>
+
+        <div class="cred">
+          <h3>Qualification or course name</h3>
+          <p>Institution, city<br>One line of detail — focus, specialisation, or dates.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===========================================================================
+     PAGE: FIELD NOTES
+     Write-ups, press, or behind-the-scenes posts. All placeholder.
+     =========================================================================== -->
+<section class="view" id="notes">
+  <div class="notes-page">
+    <div class="wrap">
+      <h1>Field notes</h1>
+
+      <div class="notes-grid">
+
+        <!-- FIELD NOTE — copy this whole <article> block to add a new one.
+             Point the href at the real article, or delete the button if the
+             note lives entirely on this page. -->
+        <article class="note" data-entry="note-1">
+          <div class="placeholder-img"></div>
+          <h3>Headline of the note or article</h3>
+          <span class="source">Publication or category</span>
+          <p>Two lines on what this covers, so someone can decide whether to read the whole thing.</p>
+          <a class="btn-outline" href="entry.html?id=note-1">Read more</a>
+        </article>
+        <!-- END FIELD NOTE -->
+
+        <article class="note" data-entry="note-2">
+          <div class="placeholder-img"></div>
+          <h3>Headline of the note or article</h3>
+          <span class="source">Publication or category</span>
+          <p>Two lines on what this covers, so someone can decide whether to read the whole thing.</p>
+          <a class="btn-outline" href="entry.html?id=note-2">Read more</a>
+        </article>
+
+        <article class="note" data-entry="note-3">
+          <div class="placeholder-img"></div>
+          <h3>Headline of the note or article</h3>
+          <span class="source">Publication or category</span>
+          <p>Two lines on what this covers, so someone can decide whether to read the whole thing.</p>
+          <a class="btn-outline" href="entry.html?id=note-3">Read more</a>
+        </article>
+
+        <article class="note" data-entry="note-4">
+          <div class="placeholder-img"></div>
+          <h3>Headline of the note or article</h3>
+          <span class="source">Publication or category</span>
+          <p>Two lines on what this covers, so someone can decide whether to read the whole thing.</p>
+          <a class="btn-outline" href="entry.html?id=note-4">Read more</a>
+        </article>
+
+        <article class="note" data-entry="note-5">
+          <div class="placeholder-img"></div>
+          <h3>Headline of the note or article</h3>
+          <span class="source">Publication or category</span>
+          <p>Two lines on what this covers, so someone can decide whether to read the whole thing.</p>
+          <a class="btn-outline" href="entry.html?id=note-5">Read more</a>
+        </article>
+
+        <article class="note" data-entry="note-6">
+          <div class="placeholder-img"></div>
+          <h3>Headline of the note or article</h3>
+          <span class="source">Publication or category</span>
+          <p>Two lines on what this covers, so someone can decide whether to read the whole thing.</p>
+          <a class="btn-outline" href="entry.html?id=note-6">Read more</a>
+        </article>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===========================================================================
+     PAGE: CONTACT
+     A static page cannot send email on its own. The form below opens the
+     visitor's mail app with the message pre-filled — see the JS at the bottom.
+     To collect messages in your inbox instead, sign up for a free form service
+     (Formspree, Web3Forms) and follow the note in the JS.
+     =========================================================================== -->
+<section class="view" id="contact">
+  <div class="contact-page">
+    <div class="wrap contact-inner">
+      <img class="contact-avatar" src="assets/avatar.png" alt="Pixel-art portrait of Hunter holding a camera">
+
+      <div>
+        <h1>Excited to<br>hear from you!</h1>
+        <form id="contact-form">
+          <label for="msg" class="visually-hidden" style="position:absolute;left:-9999px">Your message</label>
+          <textarea id="msg" placeholder="Write your message here..." required=""></textarea>
+          <button type="submit" class="btn-wide">Send Message</button>
+        </form>
+        <p class="contact-note">Or email me directly at <a href="mailto:g.alessandroerazo@gmail.com">g.alessandroerazo@gmail.com</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===========================================================================
+     FOOTER
+     =========================================================================== -->
+<footer>
+  <div class="footer-inner">
+    <button data-view="home" aria-label="Hunter — go to home">
+      <img class="mark" src="assets/hunter-wordmark.png" alt="Hunter">
+    </button>
+    <div class="footer-links">
+      <button data-view="contact">Contact</button>
+      <a href="https://instagram.com/hunterishiding" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+/* ===========================================================================
+   PAGE SWITCHING
+   Any element with data-view="X" shows the <section id="X"> and hides the
+   rest. That covers the nav, the footer, and the in-page buttons — you never
+   need to touch this to add a new page; just add a <section class="view"
+   id="newpage"> and a nav button with data-view="newpage".
+   =========================================================================== */
+const views = document.querySelectorAll('.view');
+const navButtons = document.querySelectorAll('nav.links button');
+
+document.querySelectorAll('[data-view]').forEach(el => {
+  el.addEventListener('click', () => {
+    const target = el.dataset.view;
+    views.forEach(v => v.classList.toggle('active', v.id === target));
+    navButtons.forEach(b => b.classList.toggle('active', b.dataset.view === target));
+    window.scrollTo({top: 0, behavior: 'instant'});
+    // Keep the URL in sync so links like razorbill.studio/#gallery work.
+    // Wrapped because this throws when the page is previewed inside a frame.
+    try { history.replaceState(null, '', '#' + target); } catch (e) {}
+  });
+});
+
+// If someone arrives at razorbill.studio/#gallery, open that page directly.
+const initial = location.hash.slice(1);
+if (initial && document.getElementById(initial)) {
+  document.querySelector(`[data-view="${initial}"]`)?.click();
+}
+
+
+/* ===========================================================================
+   COVER PHOTOS ARE LINKS
+   A gallery entry or note whose block carries data-entry opens its own page
+   when you click the cover photo, not just the button underneath.
+   =========================================================================== */
+// Inside the editor's preview frame, clicking a cover selects it for editing
+// rather than navigating away, so this is only wired up on the real site.
+const inEditor = window.self !== window.top;
+if (!inEditor) document.querySelectorAll('[data-entry]').forEach(block => {
+  const id = block.dataset.entry;
+  const cover = block.querySelector('img, .placeholder-img');
+  if (!cover) return;
+  cover.classList.add('cover-link');
+  cover.addEventListener('click', () => { location.href = 'entry.html?id=' + id; });
+});
+
+
+/* ===========================================================================
+   SCROLL ANIMATIONS
+   Anything with data-anim fades in once, the first time it is scrolled to.
+   =========================================================================== */
+const animated = document.querySelectorAll('[data-anim]');
+if (animated.length && 'IntersectionObserver' in window) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add('shown'); io.unobserve(en.target); }
+    });
+  }, {threshold: 0.12});
+  animated.forEach(el => io.observe(el));
+} else {
+  animated.forEach(el => el.classList.add('shown'));
+}
+
+
+/* ===========================================================================
+   CONTACT FORM
+   Static hosting has no server, so this opens the visitor's email client with
+   their message already typed in.
+
+   TO USE A REAL FORM INSTEAD (free, no subscription):
+     1. Create a form at formspree.io or web3forms.com and copy the endpoint.
+     2. In the HTML above, change the <form> tag to:
+          <form action="YOUR_ENDPOINT" method="POST">
+        and give the textarea a name:  <textarea name="message" ...>
+     3. Delete this whole event listener.
+   =========================================================================== */
+document.getElementById('contact-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const body = encodeURIComponent(document.getElementById('msg').value);
+  window.location.href = `mailto:g.alessandroerazo@gmail.com?subject=Hello%20from%20razorbill.studio&body=${body}`;
+});
+</script>
+
+
+
+</body></html>
