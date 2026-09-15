@@ -1,0 +1,227 @@
+{
+  "site": {
+    "instagram": "https://instagram.com/hunterishiding",
+    "email": "g.alessandroerazo@gmail.com"
+  },
+  "entries": {
+    "gal-1": {
+      "type": "gallery",
+      "title": "Basketball Copa Jaguar",
+      "year": "2026",
+      "desc": "An idea that turned into reality exactly how I imagined it.",
+      "cover": "",
+      "media": []
+    },
+    "gal-2": {
+      "type": "gallery",
+      "title": "X Aniversario de Gastronomía",
+      "year": "2026",
+      "desc": "One-line description of the shoot — what it was, where it was, and what you were going for.",
+      "cover": "",
+      "media": []
+    },
+    "gal-3": {
+      "type": "gallery",
+      "title": "XV Aniversario del CAM",
+      "year": "2026",
+      "desc": "One-line description of the shoot — what it was, where it was, and what you were going for.",
+      "cover": "",
+      "media": []
+    },
+    "gal-4": {
+      "type": "gallery",
+      "title": "El Salvador",
+      "year": "2026",
+      "desc": "Current challenge: Capture what's most relevant on this family trip",
+      "cover": "",
+      "media": []
+    },
+    "gal-5": {
+      "type": "gallery",
+      "title": "El Picacho",
+      "year": "2026",
+      "desc": "Highlights from a Youth Group Activity",
+      "cover": "",
+      "media": []
+    },
+    "gal-6": {
+      "type": "gallery",
+      "title": "AI vs Machine",
+      "year": "2025",
+      "desc": "When you're on-set at a short film... Why not become BTS photographer?",
+      "cover": "assets/dsc02404.jpg",
+      "media": [
+        {
+          "src": "assets/dsc02404.jpg",
+          "orient": "h",
+          "caption": "",
+          "alt": "",
+          "ar": "",
+          "pos": "50% 50%"
+        }
+      ]
+    },
+    "note-1": {
+      "type": "note",
+      "title": "Three mornings at La Tigra",
+      "category": "Field note",
+      "date": "2026-03-14",
+      "desc": "What fog does to a lens, and why the second morning is always better.",
+      "cover": "",
+      "blocks": [
+        {
+          "t": "rich",
+          "html": "<p>First light in the cloud forest is a moving target.</p><h2>The second morning</h2><p>By day two you know where the light lands.</p>"
+        },
+        {
+          "t": "figure",
+          "src": "assets/el-salvador.jpg",
+          "w": "",
+          "caption": "Pigeons, first light"
+        },
+        {
+          "t": "rich",
+          "html": "<blockquote>Wait for the fog to lift, then wait a little longer.</blockquote>"
+        }
+      ]
+    },
+    "note-2": {
+      "type": "note",
+      "title": "Headline of the note or article",
+      "category": "Publication or category",
+      "date": "",
+      "desc": "Two lines on what this covers, so someone can decide whether to read the whole thing.",
+      "cover": "",
+      "blocks": [
+        {
+          "t": "rich",
+          "html": "<p>Write your post here.</p>"
+        }
+      ]
+    },
+    "note-3": {
+      "type": "note",
+      "title": "Headline of the note or article",
+      "category": "Publication or category",
+      "date": "",
+      "desc": "Two lines on what this covers, so someone can decide whether to read the whole thing.",
+      "cover": "",
+      "blocks": [
+        {
+          "t": "rich",
+          "html": "<p>Write your post here.</p>"
+        }
+      ]
+    },
+    "note-4": {
+      "type": "note",
+      "title": "Headline of the note or article",
+      "category": "Publication or category",
+      "date": "",
+      "desc": "Two lines on what this covers, so someone can decide whether to read the whole thing.",
+      "cover": "",
+      "blocks": [
+        {
+          "t": "rich",
+          "html": "<p>Write your post here.</p>"
+        }
+      ]
+    },
+    "note-5": {
+      "type": "note",
+      "title": "Headline of the note or article",
+      "category": "Publication or category",
+      "date": "",
+      "desc": "Two lines on what this covers, so someone can decide whether to read the whole thing.",
+      "cover": "",
+      "blocks": [
+        {
+          "t": "rich",
+          "html": "<p>Write your post here.</p>"
+        }
+      ]
+    },
+    "note-6": {
+      "type": "note",
+      "title": "Headline of the note or article",
+      "category": "Publication or category",
+      "date": "",
+      "desc": "Two lines on what this covers, so someone can decide whether to read the whole thing.",
+      "cover": "",
+      "blocks": [
+        {
+          "t": "rich",
+          "html": "<p>Write your post here.</p>"
+        }
+      ]
+    },
+    "tile-xv": {
+      "type": "gallery",
+      "title": "XV del CAM",
+      "year": "",
+      "desc": "",
+      "cover": "assets/xv-del-cam.jpg",
+      "media": [
+        {
+          "src": "assets/xv-del-cam.jpg",
+          "orient": "",
+          "caption": "",
+          "alt": "XV del CAM",
+          "ar": "",
+          "pos": "50% 50%"
+        }
+      ]
+    },
+    "tile-ai": {
+      "type": "gallery",
+      "title": "AI vs Machine",
+      "year": "",
+      "desc": "",
+      "cover": "assets/ai-vs-machine.jpg",
+      "media": [
+        {
+          "src": "assets/ai-vs-machine.jpg",
+          "orient": "h",
+          "caption": "",
+          "alt": "AI vs Machine",
+          "ar": "",
+          "pos": "50% 50%"
+        }
+      ]
+    },
+    "tile-sv": {
+      "type": "gallery",
+      "title": "El Salvador",
+      "year": "",
+      "desc": "",
+      "cover": "assets/el-salvador.jpg",
+      "media": [
+        {
+          "src": "assets/el-salvador.jpg",
+          "orient": "h",
+          "caption": "",
+          "alt": "El Salvador",
+          "ar": "",
+          "pos": "50% 50%"
+        }
+      ]
+    },
+    "tile-bb": {
+      "type": "gallery",
+      "title": "Basketball",
+      "year": "",
+      "desc": "",
+      "cover": "assets/basketball.jpg",
+      "media": [
+        {
+          "src": "assets/basketball.jpg",
+          "orient": "h",
+          "caption": "",
+          "alt": "Basketball",
+          "ar": "",
+          "pos": "50% 50%"
+        }
+      ]
+    }
+  }
+}
