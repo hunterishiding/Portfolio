@@ -158,7 +158,7 @@
     "tile-xv": {
       "type": "gallery",
       "title": "XV del CAM",
-      "year": "",
+      "year": "2026",
       "desc": "",
       "cover": "assets/xv-del-cam.jpg",
       "media": [
@@ -167,6 +167,14 @@
           "orient": "",
           "caption": "",
           "alt": "XV del CAM",
+          "ar": "",
+          "pos": "50% 50%"
+        },
+        {
+          "src": "assets/xv-cam.mov",
+          "orient": "full",
+          "caption": "",
+          "alt": "",
           "ar": "",
           "pos": "50% 50%"
         }
