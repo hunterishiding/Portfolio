@@ -17,7 +17,7 @@
       "title": "X Aniversario de Gastronomía",
       "year": "2026",
       "desc": "One-line description of the shoot — what it was, where it was, and what you were going for.",
-      "cover": "",
+      "cover": "assets/screenshot-2026-09-15-153907.png",
       "media": []
     },
     "gal-3": {
@@ -194,7 +194,7 @@
       "title": "El Salvador",
       "year": "",
       "desc": "",
-      "cover": "assets/el-salvador.jpg",
+      "cover": "assets/dsc-2069.jpg",
       "media": [
         {
           "src": "assets/el-salvador.jpg",
