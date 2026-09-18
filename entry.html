@@ -77,6 +77,11 @@ nav.links a:hover{opacity:1;}
 }
 .entry-head .lede{font-size:1rem; line-height:1.6; color:var(--cream);
                   max-width:60ch; margin:20px 0 0; opacity:.92;}
+.entry-head .subtitle{font-size:1.05rem; color:var(--sand); opacity:.85; margin:8px 0 0;}
+.lang-btn{font-size:.76rem; color:var(--sand); opacity:.75; border:1px solid rgba(231,226,208,.35);
+  border-radius:6px; padding:4px 10px; flex:none; background:none;}
+.lang-btn:hover{opacity:1; background:rgba(231,226,208,.08);}
+.banner{width:100%; aspect-ratio:21/9; object-fit:cover; border-radius:6px; margin:26px 0 0;}
 
 /* ---------- Collection grid ---------- */
 .collection{background:var(--pine); padding:0 0 90px;}
@@ -86,9 +91,15 @@ nav.links a:hover{opacity:1;}
             grid-auto-rows:8px; column-gap:18px; align-items:start;}
 .m-item{margin:0; grid-row-end:span 30;}
 .m-item.full{grid-column:1 / -1;}
+.m-item.half{grid-column:span 2;}
 .m-item img,
 .m-item video{width:100%; border-radius:6px; object-fit:cover; background:rgba(231,226,208,.07);}
 .m-item figcaption{font-size:.78rem; color:var(--cream); opacity:.75; margin-top:8px;}
+.embed-wrap{position:relative; width:100%; aspect-ratio:16/9; border-radius:6px; overflow:hidden;
+  background:rgba(231,226,208,.07); display:flex; align-items:center; justify-content:center;}
+.embed-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+.embed-wrap.instagram{aspect-ratio:auto; background:none;}
+.embed-wrap a{color:var(--sand); text-decoration:underline; font-size:.85rem;}
 
 /* ---------- Blog post body ---------- */
 .post{background:var(--cream); padding:56px 0 100px;}
@@ -143,6 +154,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
 
 @media (max-width:900px){
   .media-grid{grid-template-columns:repeat(2,1fr);}
+  .m-item.half{grid-column:span 1;}
   .post-body figure.w-wide{width:auto; margin-left:0; transform:none;}
 }
 @media (max-width:640px){
@@ -167,6 +179,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
       <a href="index.html#notes">field notes</a>
       <a href="index.html#contact">contact</a>
     </nav>
+    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
   </div>
 </header>
 
@@ -186,11 +199,13 @@ footer{background:var(--pine-deep); padding:18px 0;}
 /* ===========================================================================
    RENDER
    Read the id from the address, pull that record out of data/entries.json,
-   and build either a collection grid or a blog post from it.
+   and build either a collection grid or a blog post from it. Re-runs
+   whenever the language toggle is used.
    =========================================================================== */
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const main = document.getElementById('main');
+const langBtn = document.getElementById('langBtn');
 
 const esc = str => String(str ?? '').replace(/[&<>"]/g, c => (
   {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]
@@ -199,16 +214,55 @@ const esc = str => String(str ?? '').replace(/[&<>"]/g, c => (
 /* A media file is shown as a <video> when its extension says so. */
 const isVideo = src => /\.(mp4|webm|mov|m4v)$/i.test(src || '');
 
+function ytId(url){
+  const m = String(url || '').match(/(?:youtu\.be\/|[?&]v=|shorts\/|embed\/)([A-Za-z0-9_-]{6,})/);
+  return m ? m[1] : '';
+}
+
+function embedTag(m){
+  const url = m.url || m.src || '';
+  if (m.provider === 'youtube'){
+    const vid = ytId(url);
+    return vid
+      ? `<div class="embed-wrap"><iframe src="https://www.youtube.com/embed/${vid}" title="YouTube video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe></div>`
+      : `<div class="embed-wrap"><a href="${esc(url)}" target="_blank" rel="noopener">Watch on YouTube</a></div>`;
+  }
+  if (m.provider === 'instagram'){
+    return `<div class="embed-wrap instagram"><blockquote class="instagram-media"
+      data-instgrm-permalink="${esc(url)}" style="width:100%;"></blockquote></div>`;
+  }
+  return `<div class="embed-wrap"><a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a></div>`;
+}
+
+function loadInstagramEmbed(){
+  if (window.instgrm){ window.instgrm.Embeds.process(); return; }
+  if (document.getElementById('ig-embed-script')) return;
+  const s = document.createElement('script');
+  s.id = 'ig-embed-script'; s.async = true; s.src = 'https://www.instagram.com/embed.js';
+  document.body.appendChild(s);
+}
+
 function mediaTag(m){
+  if (m.kind === 'embed') return embedTag(m);
   const style = m.ar ? ` style="aspect-ratio:${esc(m.ar)};object-position:${esc(m.pos || '50% 50%')}"` : '';
   return isVideo(m.src)
     ? `<video src="${esc(m.src)}" controls playsinline preload="metadata"${style}></video>`
     : `<img src="${esc(m.src)}" alt="${esc(m.alt || '')}" loading="lazy"${style}>`;
 }
 
-function renderCollection(e){
+function orientClass(o){
+  return o === 'v' ? 'v' : (o === 'full' ? 'full' : (o === 'half' ? 'half' : ''));
+}
+
+function renderCollection(e, lang){
+  const title    = (lang === 'en' && e.title_en)    ? e.title_en    : e.title;
+  const subtitle = (lang === 'en' && e.subtitle_en) ? e.subtitle_en : e.subtitle;
+  const desc     = (lang === 'en' && e.desc_en)     ? e.desc_en     : e.desc;
+
   const items = (e.media || []).map(m => `
-    <figure class="m-item ${m.orient === 'v' ? 'v' : (m.orient === 'full' ? 'full' : '')}" data-anim="up">
+    <figure class="m-item ${orientClass(m.orient)}" data-anim="up">
       ${mediaTag(m)}
       ${m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : ''}
     </figure>`).join('');
@@ -216,12 +270,14 @@ function renderCollection(e){
   main.innerHTML = `
     <div class="entry-head">
       <div class="wrap">
-        <a class="back" href="index.html#gallery">← back to gallery</a>
+        <a class="back" href="index.html#gallery" data-en="">← back to gallery</a>
         ${e.year ? `<div class="meta">${esc(e.year)}</div>` : ''}
-        <h1>${esc(e.title || 'Untitled')}</h1>
-        ${e.desc ? `<p class="lede">${esc(e.desc)}</p>` : ''}
+        <h1>${esc(title || 'Untitled')}</h1>
+        ${subtitle ? `<p class="subtitle">${esc(subtitle)}</p>` : ''}
+        ${desc ? `<p class="lede">${esc(desc)}</p>` : ''}
       </div>
     </div>
+    ${e.banner ? `<div class="wrap"><img class="banner" src="${esc(e.banner)}" alt=""></div>` : ''}
     <div class="collection">
       <div class="wrap">
         ${items
@@ -229,31 +285,43 @@ function renderCollection(e){
           : `<div class="empty">No photos in this collection yet — add some in the editor.</div>`}
       </div>
     </div>`;
+
+  if ((e.media || []).some(m => m.kind === 'embed' && m.provider === 'instagram')) loadInstagramEmbed();
 }
 
-function renderPost(e){
-  const body = (e.blocks || []).map(b => {
+function renderPost(e, lang){
+  const useEn    = lang === 'en' && Array.isArray(e.blocks_en) && e.blocks_en.length;
+  const blocks   = useEn ? e.blocks_en : e.blocks;
+  const title    = (lang === 'en' && e.title_en)    ? e.title_en    : e.title;
+  const desc     = (lang === 'en' && e.desc_en)     ? e.desc_en     : e.desc;
+  const category = (lang === 'en' && e.category_en) ? e.category_en : e.category;
+
+  const body = (blocks || []).map(b => {
     if (b.t === 'figure'){
       return `<figure class="${esc(b.w || '')}" data-anim="up">
         ${mediaTag(b)}
         ${b.caption ? `<figcaption>${esc(b.caption)}</figcaption>` : ''}
       </figure>`;
     }
+    if (b.t === 'embed'){
+      return `<figure data-anim="up">${embedTag(b)}</figure>`;
+    }
     // Rich-text blocks are stored as sanitised HTML produced by the editor.
     return b.html || '';
   }).join('');
 
   const date = e.date
-    ? new Date(e.date + 'T00:00:00').toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'})
+    ? new Date(e.date + 'T00:00:00').toLocaleDateString(lang === 'en' ? 'en-US' : 'es-HN',
+        {year:'numeric', month:'long', day:'numeric'})
     : '';
 
   main.innerHTML = `
     <div class="entry-head">
       <div class="wrap">
-        <a class="back" href="index.html#notes">← back to field notes</a>
-        <div class="meta">${[esc(e.category), esc(date)].filter(Boolean).join(' · ')}</div>
-        <h1>${esc(e.title || 'Untitled')}</h1>
-        ${e.desc ? `<p class="lede">${esc(e.desc)}</p>` : ''}
+        <a class="back" href="index.html#notes" data-en="">← back to field notes</a>
+        <div class="meta">${[esc(category), esc(date)].filter(Boolean).join(' · ')}</div>
+        <h1>${esc(title || 'Untitled')}</h1>
+        ${desc ? `<p class="lede">${esc(desc)}</p>` : ''}
       </div>
     </div>
     <div class="post">
@@ -263,6 +331,8 @@ function renderPost(e){
         </div>
       </div>
     </div>`;
+
+  if ((blocks || []).some(b => b.t === 'embed' && b.provider === 'instagram')) loadInstagramEmbed();
 }
 
 function notFound(msg){
@@ -273,46 +343,78 @@ function notFound(msg){
     </div></div>`;
 }
 
+/* ----- Masonry + scroll-reveal, re-run after every (re)render ----- */
+function layoutAndReveal(){
+  const grid = main.querySelector('.media-grid');
+  if (grid){
+    const ROW = 8, GAP = 18;
+    const layout = () => {
+      grid.querySelectorAll('.m-item').forEach(it => {
+        it.style.gridRowEnd = 'span ' + Math.ceil((it.getBoundingClientRect().height + GAP) / ROW);
+      });
+    };
+    layout();
+    grid.querySelectorAll('img, video').forEach(m => {
+      m.addEventListener('load', layout);
+      m.addEventListener('loadedmetadata', layout);
+    });
+    window.addEventListener('resize', layout);
+    if (document.fonts) document.fonts.ready.then(layout);
+  }
+  const els = main.querySelectorAll('[data-anim]');
+  if ('IntersectionObserver' in window){
+    const io = new IntersectionObserver(ents => ents.forEach(en => {
+      if (en.isIntersecting){ en.target.classList.add('shown'); io.unobserve(en.target); }
+    }), {threshold:.12});
+    els.forEach(el => io.observe(el));
+  } else {
+    els.forEach(el => el.classList.add('shown'));
+  }
+}
+
+/* ----- Static chrome translated by hand (data-en attributes) ----- */
+function applyStaticTranslations(lang){
+  document.querySelectorAll('[data-en]').forEach(el => {
+    if (el.dataset.esOrig === undefined) el.dataset.esOrig = el.innerHTML;
+    el.innerHTML = (lang === 'en' && el.dataset.en) ? el.dataset.en : el.dataset.esOrig;
+  });
+}
+
+/* ===========================================================================
+   LANGUAGE + BOOT
+   =========================================================================== */
+let db = null;
+function currentLang(){
+  try {
+    const stored = localStorage.getItem('siteLang');
+    if (stored) return stored;
+  } catch(e) {}
+  return (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'es';
+}
+let lang = currentLang();
+
+function renderAll(){
+  const e = db.entries && db.entries[id];
+  if (!e) return notFound('That entry does not exist yet.');
+
+  document.title = (e.title || 'Hunter') + ' — Hunter';
+  if (db.site && db.site.instagram) document.getElementById('ig').href = db.site.instagram;
+
+  (e.type === 'note' ? renderPost : renderCollection)(e, lang);
+  applyStaticTranslations(lang);
+  if (langBtn) langBtn.textContent = lang.toUpperCase();
+  layoutAndReveal();
+}
+
+langBtn?.addEventListener('click', () => {
+  lang = lang === 'en' ? 'es' : 'en';
+  try { localStorage.setItem('siteLang', lang); } catch(e) {}
+  renderAll();
+});
+
 fetch('data/entries.json', {cache:'no-store'})
   .then(r => r.ok ? r.json() : Promise.reject(r.status))
-  .then(db => {
-    const e = db.entries && db.entries[id];
-    if (!e) return notFound('That entry does not exist yet.');
-
-    document.title = (e.title || 'Hunter') + ' — Hunter';
-    if (db.site && db.site.instagram) document.getElementById('ig').href = db.site.instagram;
-
-    (e.type === 'note' ? renderPost : renderCollection)(e);
-
-    // ----- Masonry: give each item a row span matching its measured height ---
-    const grid = main.querySelector('.media-grid');
-    if (grid){
-      const ROW = 8, GAP = 18;
-      const layout = () => {
-        grid.querySelectorAll('.m-item').forEach(it => {
-          it.style.gridRowEnd = 'span ' + Math.ceil((it.getBoundingClientRect().height + GAP) / ROW);
-        });
-      };
-      layout();
-      grid.querySelectorAll('img, video').forEach(m => {
-        m.addEventListener('load', layout);
-        m.addEventListener('loadedmetadata', layout);
-      });
-      window.addEventListener('resize', layout);
-      if (document.fonts) document.fonts.ready.then(layout);
-    }
-
-    // Reveal animated blocks as they scroll into view.
-    const els = main.querySelectorAll('[data-anim]');
-    if ('IntersectionObserver' in window){
-      const io = new IntersectionObserver(ents => ents.forEach(en => {
-        if (en.isIntersecting){ en.target.classList.add('shown'); io.unobserve(en.target); }
-      }), {threshold:.12});
-      els.forEach(el => io.observe(el));
-    } else {
-      els.forEach(el => el.classList.add('shown'));
-    }
-  })
+  .then(d => { db = d; renderAll(); })
   .catch(() => notFound('Could not load data/entries.json.'));
 </script>
 </body>

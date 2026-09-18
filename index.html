@@ -100,6 +100,9 @@ header{
   gap:24px; padding:14px 28px;
 }
 .nav-wrap .mark{height:26px; width:auto;}   /* the HUNTER wordmark, top left */
+.lang-btn{font-size:.76rem; color:var(--sand); opacity:.75; border:1px solid rgba(231,226,208,.35);
+  border-radius:6px; padding:4px 10px; flex:none; background:none;}
+.lang-btn:hover{opacity:1; background:rgba(231,226,208,.08);}
 
 nav.links{display:flex; gap:26px; flex-wrap:wrap;}
 nav.links button{
@@ -521,6 +524,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
       <button data-view="notes">field notes</button>
       <button data-view="contact">contact</button>
     </nav>
+    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
   </div>
 </header>
 
@@ -864,6 +868,38 @@ footer{background:var(--pine-deep); padding:18px 0;}
     </div>
   </div>
 </footer>
+
+
+<script>
+/* ===========================================================================
+   LANGUAGE TOGGLE
+   Any element with a data-en attribute can show different text in English.
+   To translate a piece of text, use the editor: click it once to edit, then
+   click it again (or tab into it) to select it as a whole and fill in
+   "English version" in the side panel. Anything left untranslated just
+   keeps showing what you wrote, in both languages.
+   =========================================================================== */
+(function(){
+  const KEY = 'siteLang';
+  const inEditor = window.self !== window.top;
+  const btn = document.getElementById('langBtn');
+  function apply(lang){
+    document.querySelectorAll('[data-en]').forEach(el => {
+      if (el.dataset.esOrig === undefined) el.dataset.esOrig = el.innerHTML;
+      el.innerHTML = (lang === 'en' && el.dataset.en) ? el.dataset.en : el.dataset.esOrig;
+    });
+    document.documentElement.lang = lang;
+    if (btn) btn.textContent = lang.toUpperCase();
+    window.__siteLang = lang;
+    try { localStorage.setItem(KEY, lang); } catch(e) {}
+  }
+  let lang = null;
+  try { lang = localStorage.getItem(KEY); } catch(e) {}
+  if (!lang) lang = (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'es';
+  apply(lang);
+  btn?.addEventListener('click', () => apply(window.__siteLang === 'en' ? 'es' : 'en'));
+})();
+</script>
 
 
 <script>

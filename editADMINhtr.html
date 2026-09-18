@@ -204,13 +204,18 @@ const dot    = document.getElementById('dot');
 
 let db        = null;    // parsed data/entries.json
 let dirHandle = null;    // local folder handle
-let gh        = null;    // {token, owner, repo, branch}
+const GH_KEY  = 'ghConfig';
+function loadGh(){ try{ const s = JSON.parse(localStorage.getItem(GH_KEY) || 'null'); return (s && s.token) ? s : null; }catch(e){ return null; } }
+function saveGh(cfg){ try{ localStorage.setItem(GH_KEY, JSON.stringify(cfg)); }catch(e){} }
+function forgetGh(){ try{ localStorage.removeItem(GH_KEY); }catch(e){} }
+let gh        = loadGh(); // {token, owner, repo, branch} — remembered between sessions
 let pending   = [];      // {name, file} media not yet written
 let dirty     = false;
 let view      = 'home';  // 'home' or an entry id
 let selBlock  = null;    // block selected in the site preview
 let selImg    = null;    // image selected in the site preview
 let selFigure = null;    // figure selected in the blog composer
+let selText   = null;    // text element focused for size/translation controls
 
 const AR = [['Free',''],['1:1','1 / 1'],['4:3','4 / 3'],['3:2','3 / 2'],
             ['16:9','16 / 9'],['9:16','9 / 16'],['4:5','4 / 5']];
@@ -223,6 +228,7 @@ const uid = p => p + '-' + Math.random().toString(36).slice(2, 8);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 function setStatus(m, k){ statusEl.textContent = m; statusEl.className = k || ''; }
+if (gh) setStatus(`Connected to ${gh.owner}/${gh.repo}. Save commits and Vercel redeploys.`, 'ok');
 function markDirty(){
   dirty = true; dot.classList.add('dirty');
   document.getElementById('bar-text').textContent = 'unsaved changes';
@@ -349,6 +355,7 @@ function setupEditing(doc){
     .tile-link{pointer-events:none !important;}
     .ed-text:hover{outline:1px dashed rgba(140,168,122,.85); outline-offset:3px; cursor:text;}
     .ed-text:focus{outline:2px solid #8CA87A; outline-offset:3px;}
+    .ed-text.selt{outline:2px solid #8CA87A; outline-offset:3px;}
     .ed-img{cursor:pointer;}
     .ed-img:hover,.ed-img.sel{outline:2px solid #8CA87A; outline-offset:2px;}
     .ed-block{position:relative;}
@@ -424,6 +431,11 @@ function setupNew(doc){
         db.entries[b.dataset.entry].title = el.textContent.trim();
         renderLayers();
       }
+    });
+    el.addEventListener('focus', () => {
+      doc.querySelectorAll('.ed-text.selt').forEach(x => x.classList.remove('selt'));
+      el.classList.add('selt');
+      selText = el; homeControls();
     });
   });
 
@@ -501,9 +513,32 @@ function homeControls(){
     </div>`;
   }
 
+  if (selText){
+    const curSize = selText.style.fontSize || '';
+    const SIZES = [['Default',''],['Small','0.85em'],['Large','1.15em'],['X-Large','1.4em']];
+    html += `<div class="group"><h2>Text</h2>
+      <label class="field">Size</label>
+      <select class="field" data-txt="size">
+        ${SIZES.map(([l, v]) => `<option value="${v}" ${curSize === v ? 'selected' : ''}>${l}</option>`).join('')}
+      </select>
+      <label class="field">English version (optional)</label>
+      <textarea class="field" data-txt="en" placeholder="Leave blank to keep this Spanish-only">${esc(selText.dataset.en || '')}</textarea>
+      <p class="hint">Visitors can switch EN/ES on the live site — only text translated here changes.</p>
+    </div>`;
+  }
+
   if (selBlock){
     const e = selBlock.dataset.entry ? db.entries[selBlock.dataset.entry] : null;
+    const curW = (selBlock.style.maxWidth || '100%').trim();
+    const WIDTHS = [['Full','100%'],['75%','75%'],['50%','50%'],['33%','33%']];
     html += `<div class="group"><h2>Selected block</h2>
+      ${e ? `<label class="field">Links to</label>
+      <select class="field" data-blk="retarget">
+        <option value="">— no page —</option>
+        ${Object.entries(db.entries).map(([eid, ee]) =>
+          `<option value="${eid}" ${eid === selBlock.dataset.entry ? 'selected' : ''}>${esc(ee.title || eid)}${ee.type === 'note' ? ' (post)' : ''}</option>`).join('')}
+      </select>
+      <p class="hint">Point this card at a different collection or post without changing how it looks.</p>` : ''}
       <label class="field">Animate on scroll</label>
       <select class="field" data-blk="anim">${animOpts(selBlock.dataset.anim || '')}</select>
       <label class="field">Text alignment</label>
@@ -511,6 +546,10 @@ function homeControls(){
         ${['left','center','right'].map(a =>
           `<button class="btn" data-align="${a}">${a}</button>`).join('')}
       </div>
+      <label class="field">Size</label>
+      <select class="field" data-blk="width">
+        ${WIDTHS.map(([l, v]) => `<option value="${v}" ${curW === v ? 'selected' : ''}>${l}</option>`).join('')}
+      </select>
       <div class="row">
         <button class="btn" data-blk="up">Move up</button>
         <button class="btn" data-blk="down">Move down</button>
@@ -520,9 +559,9 @@ function homeControls(){
     </div>`;
   }
 
-  if (!selImg && !selBlock){
+  if (!selImg && !selBlock && !selText){
     html += `<div class="group"><h2>Selection</h2>
-      <p class="sel-none">Click a photo to crop it, or click a section to animate, move or delete it.</p></div>`;
+      <p class="sel-none">Click a photo to crop it, click text to resize or translate it, or click a section to retarget, resize, animate, move or delete it.</p></div>`;
   }
 
   html += `<div class="group"><h2>Site links</h2>
@@ -532,9 +571,9 @@ function homeControls(){
     <input class="field" id="in-ig" value="${esc(db.site?.instagram || '')}">
   </div>
   <div class="group"><h2>How to use</h2>
-    <p class="hint"><b>Text</b> — click and type.<br>
+    <p class="hint"><b>Text</b> — click and type; click again to size or translate it.<br>
     <b>Photos</b> — click to select, then crop.<br>
-    <b>Blocks</b> — hover for move, duplicate, open and delete.<br>
+    <b>Blocks</b> — hover for move, duplicate, open and delete; click to resize, retarget or animate.<br>
     <b>Pages</b> — the rail on the left.</p>
   </div>`;
 
@@ -574,6 +613,37 @@ function wireHomeControls(){
     });
   });
 
+  ctx.querySelector('[data-txt="size"]')?.addEventListener('change', e => {
+    if (e.target.value) selText.style.fontSize = e.target.value;
+    else selText.style.removeProperty('font-size');
+    markDirty();
+  });
+  ctx.querySelector('[data-txt="en"]')?.addEventListener('input', e => {
+    if (e.target.value.trim()) selText.dataset.en = e.target.value;
+    else delete selText.dataset.en;
+    markDirty();
+  });
+
+  ctx.querySelector('[data-blk="retarget"]')?.addEventListener('change', e => {
+    const newId = e.target.value, el = selBlock;
+    if (!newId) delete el.dataset.entry; else el.dataset.entry = newId;
+    el.querySelectorAll('a[href^="entry.html"]').forEach(a => {
+      if (newId) a.setAttribute('href', 'entry.html?id=' + newId);
+    });
+    markDirty(); renderLayers(); homeControls();
+  });
+  ctx.querySelector('[data-blk="width"]')?.addEventListener('change', e => {
+    if (e.target.value && e.target.value !== '100%'){
+      selBlock.style.maxWidth = e.target.value;
+      selBlock.style.marginLeft = 'auto'; selBlock.style.marginRight = 'auto';
+    }else{
+      selBlock.style.removeProperty('max-width');
+      selBlock.style.removeProperty('margin-left');
+      selBlock.style.removeProperty('margin-right');
+    }
+    markDirty();
+  });
+
   ctx.querySelector('[data-blk="anim"]')?.addEventListener('change', e => {
     if (e.target.value) selBlock.dataset.anim = e.target.value;
     else selBlock.removeAttribute('data-anim');
@@ -584,7 +654,7 @@ function wireHomeControls(){
     selBlock.style.textAlign = b.dataset.align; markDirty();
   });
 
-  ctx.querySelectorAll('[data-blk]').forEach(b => b.onclick = () => {
+  ctx.querySelectorAll('button[data-blk]').forEach(b => b.onclick = () => {
     const a = b.dataset.blk, el = selBlock;
     if (a === 'up'   && el.previousElementSibling) el.parentNode.insertBefore(el, el.previousElementSibling);
     if (a === 'down' && el.nextElementSibling)     el.parentNode.insertBefore(el.nextElementSibling, el);
@@ -696,7 +766,7 @@ const preview = p => previews[p] || p;
    ENTRY EDITOR — collections and blog posts
    =========================================================================== */
 function openEntry(id){
-  view = id; selBlock = null; selImg = null; selFigure = null;
+  view = id; selBlock = null; selImg = null; selFigure = null; selText = null;
   frame.style.display = 'none'; pane.style.display = 'block';
   const e = db.entries[id];
   document.getElementById('bar-text').textContent =
@@ -711,22 +781,39 @@ function entryMetaControls(id, e){
     <div class="group"><h2>${isNote ? 'Post' : 'Collection'} details</h2>
       <label class="field">Title</label>
       <input class="field" data-m="title" value="${esc(e.title)}">
+      <label class="field">Title — English (optional)</label>
+      <input class="field" data-m="title_en" value="${esc(e.title_en || '')}">
       ${isNote ? `
       <label class="field">Category</label>
       <input class="field" data-m="category" value="${esc(e.category || '')}">
+      <label class="field">Category — English (optional)</label>
+      <input class="field" data-m="category_en" value="${esc(e.category_en || '')}">
       <label class="field">Date</label>
       <input class="field" type="date" data-m="date" value="${esc(e.date || '')}">`
       : `<label class="field">Year</label>
-      <input class="field" data-m="year" value="${esc(e.year || '')}">`}
+      <input class="field" data-m="year" value="${esc(e.year || '')}">
+      <label class="field">Subtitle</label>
+      <input class="field" data-m="subtitle" value="${esc(e.subtitle || '')}">
+      <label class="field">Subtitle — English (optional)</label>
+      <input class="field" data-m="subtitle_en" value="${esc(e.subtitle_en || '')}">`}
       <label class="field">Short description</label>
       <textarea class="field" data-m="desc">${esc(e.desc || '')}</textarea>
+      <label class="field">Short description — English (optional)</label>
+      <textarea class="field" data-m="desc_en">${esc(e.desc_en || '')}</textarea>
     </div>
+    ${!isNote ? `<div class="group"><h2>Banner</h2>
+      ${e.banner ? `<button class="btn" data-act="banner-replace">Replace banner…</button>
+                    <button class="btn danger" data-act="banner-remove">Remove banner</button>`
+                 : `<button class="btn" data-act="banner-add">Add a banner image…</button>`}
+      <p class="hint">A full-width image shown above this collection's grid.</p>
+    </div>` : ''}
     <div class="group"><h2>Content</h2>
       ${isNote
         ? `<button class="btn" data-act="add-fig">Add photo or video…</button>
-           <p class="hint">Click an attachment in the post to resize or remove it.</p>`
+           <p class="hint">Click an attachment in the post to resize or remove it. Use the composer's Embed button for Instagram/YouTube.</p>`
         : `<button class="btn" data-act="add-media">Add photos or videos…</button>
-           <p class="hint">Media packs itself — tall and wide sit together. “Full width” breaks across the page.</p>`}
+           <button class="btn" data-act="add-embed">Add Instagram/YouTube embed…</button>
+           <p class="hint">Media packs itself — tall, wide and half-width sit together. “Full width” breaks across the page.</p>`}
     </div>
     <div class="group"><h2>Page</h2>
       <button class="btn" data-act="back">← Back to the site</button>
@@ -753,12 +840,30 @@ function entryMetaControls(id, e){
       e.media.push({src:p, orient:'h', caption:'', alt:'', ar:'', pos:'50% 50%'});
       markDirty(); renderCollectionEditor(id, e); renderLayers();
     }));
+  ctx.querySelector('[data-act="add-embed"]')?.addEventListener('click', () => {
+    const url = prompt('Paste an Instagram or YouTube link:');
+    if (!url) return;
+    const provider = /youtu\.?be/i.test(url) ? 'youtube' : (/instagram\.com/i.test(url) ? 'instagram' : 'link');
+    e.media.push({kind:'embed', url:url.trim(), provider, caption:'', orient:''});
+    markDirty(); renderCollectionEditor(id, e); renderLayers();
+  });
   ctx.querySelector('[data-act="add-fig"]')?.addEventListener('click',
     () => pickMedia(async f => {
       const p = await stageMedia(f);
       previews[p] = URL.createObjectURL(f);
       insertFigure(p);
     }));
+  ['banner-add','banner-replace'].forEach(act => {
+    ctx.querySelector(`[data-act="${act}"]`)?.addEventListener('click', () => pickMedia(async f => {
+      const p = await stageMedia(f);
+      previews[p] = URL.createObjectURL(f);
+      e.banner = p;
+      markDirty(); renderCollectionEditor(id, e); renderLayers();
+    }, 'image/*'));
+  });
+  ctx.querySelector('[data-act="banner-remove"]')?.addEventListener('click', () => {
+    e.banner = ''; markDirty(); renderCollectionEditor(id, e);
+  });
 }
 
 /* Keep the card on the main site showing the same title as its page. */
@@ -777,18 +882,32 @@ function renderCollectionEditor(id, e){
 
   const grid = document.getElementById('mgrid');
   if (!e.media.length){
-    grid.innerHTML = `<p class="sel-none">No media yet — use “Add photos or videos” on the left.</p>`;
+    grid.innerHTML = `<p class="sel-none">No media yet — use “Add photos or videos” or “Add embed” on the left.</p>`;
     return;
   }
 
   grid.innerHTML = e.media.map((m, i) => {
+    if (m.kind === 'embed'){
+      return `<div class="media-card">
+        <div class="thumb" style="display:flex;align-items:center;justify-content:center;font-size:.72rem;opacity:.65;">${esc((m.provider || 'link').toUpperCase())} embed</div>
+        <div class="meta">
+          <input data-i="${i}" data-url="1" placeholder="Embed URL" value="${esc(m.url || '')}" style="flex:1 1 100%;">
+          <input data-i="${i}" data-cap="1" placeholder="caption" value="${esc(m.caption || '')}" style="flex:1 1 100%;">
+          <button data-i="${i}" data-mv="-1">←</button>
+          <button data-i="${i}" data-mv="1">→</button>
+          <button data-i="${i}" data-rm="1" class="del">✕ Remove</button>
+        </div>
+      </div>`;
+    }
     const src = preview(m.src);
     const vid = /\.(mp4|webm|mov|m4v)$/i.test(m.src);
+    const pos = (m.pos || '50% 50%').split(/\s+/);
     return `<div class="media-card">
       ${vid ? `<video class="thumb" src="${esc(src)}" muted></video>`
             : `<img class="thumb" src="${esc(src)}" alt="">`}
       <div class="meta">
-        <button data-i="${i}" data-o=""     class="${m.orient !== 'full' ? 'on' : ''}">Normal</button>
+        <button data-i="${i}" data-o=""     class="${(m.orient || '') !== 'full' && m.orient !== 'half' ? 'on' : ''}">Normal</button>
+        <button data-i="${i}" data-o="half" class="${m.orient === 'half' ? 'on' : ''}">Half</button>
         <button data-i="${i}" data-o="full" class="${m.orient === 'full' ? 'on' : ''}">Full width</button>
         <button data-i="${i}" data-mv="-1">←</button>
         <button data-i="${i}" data-mv="1">→</button>
@@ -797,6 +916,8 @@ function renderCollectionEditor(id, e){
           ${AR.map(([l, v]) => `<option value="${v}" ${(m.ar || '') === v ? 'selected' : ''}>${l}</option>`).join('')}
         </select>
         <input data-i="${i}" data-cap="1" placeholder="caption" value="${esc(m.caption || '')}">
+        <input data-i="${i}" data-px="1" type="range" min="0" max="100" value="${parseInt(pos[0]) || 50}" title="Crop across" style="flex:1 1 45%;">
+        <input data-i="${i}" data-py="1" type="range" min="0" max="100" value="${parseInt(pos[1]) || 50}" title="Crop down" style="flex:1 1 45%;">
       </div>
     </div>`;
   }).join('');
@@ -814,8 +935,16 @@ function renderCollectionEditor(id, e){
   };
   grid.oninput = ev => {
     const t = ev.target, i = +t.dataset.i;
-    if (t.dataset.cap){ e.media[i].caption = t.value; markDirty(); }
-    if (t.dataset.ar){ e.media[i].ar = t.value; markDirty(); }
+    if (t.dataset.cap) { e.media[i].caption = t.value; markDirty(); }
+    if (t.dataset.ar)  { e.media[i].ar = t.value; markDirty(); }
+    if (t.dataset.url) { e.media[i].url = t.value; markDirty(); }
+    if (t.dataset.px || t.dataset.py){
+      const cur = (e.media[i].pos || '50% 50%').split(/\s+/);
+      if (t.dataset.px) cur[0] = t.value + '%';
+      if (t.dataset.py) cur[1] = t.value + '%';
+      e.media[i].pos = cur.join(' ');
+      markDirty();
+    }
   };
   grid.onchange = grid.oninput;
 }
@@ -823,12 +952,19 @@ function renderCollectionEditor(id, e){
 /* ---------- Blog post ---------- */
 function renderPostEditor(id, e){
   entryMetaControls(id, e);
-  const body = (e.blocks || []).map(b => b.t === 'figure' ? figureHTML(b) : (b.html || '')).join('');
+  let plang = 'es';
+  const bodyFor = l => ((l === 'en' ? e.blocks_en : e.blocks) || [])
+    .map(b => b.t === 'figure' ? figureHTML(b) : (b.t === 'embed' ? embedHTML(b) : (b.html || ''))).join('');
 
   pane.innerHTML = `
     <h2>${esc(e.title)}</h2>
     <p class="kind">Blog post</p>
+    <p class="hint" style="margin-bottom:10px;">Switch below to add an optional English version of this post.</p>
     <div id="toolbar">
+      <select id="postLang" style="margin-right:6px;">
+        <option value="es">Editing: Spanish (main)</option>
+        <option value="en">Editing: English (optional)</option>
+      </select>
       <button data-c="bold"><b>B</b></button>
       <button data-c="italic"><i>I</i></button>
       <button data-c="underline"><u>U</u></button>
@@ -842,13 +978,23 @@ function renderPostEditor(id, e){
       <button data-c="insertOrderedList">1. List</button>
       <input type="color" data-color value="#1E2E23" title="Text colour">
       <button data-link>Link</button>
+      <button data-embed>Embed</button>
       <button data-c="removeFormat">Clear</button>
     </div>
-    <div id="composer" contenteditable="true">${body}</div>`;
+    <div id="composer" contenteditable="true">${bodyFor('es')}</div>`;
 
   const comp = document.getElementById('composer');
-  const save = () => { e.blocks = readComposer(comp); markDirty(); };
+  const save = () => {
+    const blocks = readComposer(comp);
+    if (plang === 'en') e.blocks_en = blocks; else e.blocks = blocks;
+    markDirty();
+  };
   comp.addEventListener('input', save);
+
+  document.getElementById('postLang').onchange = ev => {
+    plang = ev.target.value;
+    comp.innerHTML = bodyFor(plang) || '<p><br></p>';
+  };
 
   const tb = document.getElementById('toolbar');
   tb.querySelectorAll('[data-c]').forEach(b => b.onclick = ev => {
@@ -865,6 +1011,14 @@ function renderPostEditor(id, e){
     ev.preventDefault(); comp.focus();
     const u = prompt('Link address:', 'https://');
     if (u) document.execCommand('createLink', false, u);
+    save();
+  };
+  tb.querySelector('[data-embed]').onclick = ev => {
+    ev.preventDefault(); comp.focus();
+    const url = prompt('Paste an Instagram or YouTube link:');
+    if (!url) return;
+    const provider = /youtu\.?be/i.test(url) ? 'youtube' : (/instagram\.com/i.test(url) ? 'instagram' : 'link');
+    document.execCommand('insertHTML', false, embedHTML({provider, url: url.trim()}));
     save();
   };
 
@@ -884,6 +1038,8 @@ const figureHTML = b => `<figure class="${b.w || ''}" contenteditable="false">
     : `<img src="${esc(preview(b.src))}" data-src="${esc(b.src)}" alt="">`}
   <figcaption contenteditable="true">${esc(b.caption || 'Caption')}</figcaption>
 </figure><p><br></p>`;
+
+const embedHTML = b => `<div class="ed-embed" contenteditable="false" data-embed="1" data-provider="${esc(b.provider || 'link')}" data-url="${esc(b.url || '')}" style="border:1px dashed rgba(231,226,208,.4);padding:14px;border-radius:8px;margin:16px 0;font-size:.8rem;opacity:.85;">🔗 ${esc((b.provider || 'link').toUpperCase())} embed — ${esc(b.url || '')}</div><p><br></p>`;
 
 function insertFigure(path){
   const comp = document.getElementById('composer');
@@ -931,6 +1087,9 @@ function readComposer(comp){
         w: node.className.replace('sel', '').trim(),
         caption: node.querySelector('figcaption')?.textContent.trim() || ''
       });
+    }else if (node.dataset && node.dataset.embed){
+      flush();
+      out.push({t:'embed', provider: node.dataset.provider || 'link', url: node.dataset.url || ''});
     }else{
       buf += node.outerHTML;
     }
@@ -990,15 +1149,16 @@ document.getElementById('btn-folder').onclick = async () => {
 };
 
 document.getElementById('btn-github').onclick = () => {
-  const repo = prompt('Repository, as owner/name:', gh ? `${gh.owner}/${gh.repo}` : '');
+  const repo = prompt('Repository, as owner/name:', gh ? `${gh.owner}/${gh.repo}` : 'hunterishding/Portfolio');
   if (!repo || !repo.includes('/')) return;
-  const token = prompt('GitHub personal access token.\n\nMake one at github.com/settings/tokens — a fine-grained token with Contents: read and write on this repo only.');
+  const token = prompt('GitHub personal access token.\n\nMake one at github.com/settings/tokens — a fine-grained token with Contents: read and write on this repo only.\n\nThis is remembered on this device, so you only need to redo this when the token expires.');
   if (!token) return;
-  const branch = prompt('Branch:', 'main') || 'main';
+  const branch = prompt('Branch:', gh?.branch || 'main') || 'main';
   const [owner, name] = repo.split('/');
   gh = {owner, repo:name, branch, token:token.trim()};
+  saveGh(gh);
   dirHandle = null;
-  setStatus(`Connected to ${owner}/${name}. Save commits and Vercel redeploys.`, 'ok');
+  setStatus(`Connected to ${owner}/${name}. Save commits and Vercel redeploys automatically from now on.`, 'ok');
 };
 
 /* Commit one file through the GitHub contents API. */
@@ -1035,7 +1195,14 @@ document.getElementById('btn-save').onclick = async () => {
         await ghPut('assets/' + name, await fileB64(file), 'Add ' + name);
       pending = [];
       clean('Committed. Vercel will redeploy in a moment.');
-    }catch(err){ setStatus('GitHub said: ' + err.message, 'warn'); }
+    }catch(err){
+      if (/bad credentials|401|403/i.test(err.message)){
+        forgetGh(); gh = null;
+        setStatus('That GitHub token no longer works — click GitHub to reconnect.', 'warn');
+      }else{
+        setStatus('GitHub said: ' + err.message, 'warn');
+      }
+    }
     return;
   }
 
