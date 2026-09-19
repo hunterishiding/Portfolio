@@ -1149,7 +1149,7 @@ document.getElementById('btn-folder').onclick = async () => {
 };
 
 document.getElementById('btn-github').onclick = () => {
-  const repo = prompt('Repository, as owner/name:', gh ? `${gh.owner}/${gh.repo}` : 'hunterishding/Portfolio');
+  const repo = prompt('Repository, as owner/name:', gh ? `${gh.owner}/${gh.repo}` : 'hunterishiding/Portfolio');
   if (!repo || !repo.includes('/')) return;
   const token = prompt('GitHub personal access token.\n\nMake one at github.com/settings/tokens — a fine-grained token with Contents: read and write on this repo only.\n\nThis is remembered on this device, so you only need to redo this when the token expires.');
   if (!token) return;
@@ -1161,18 +1161,26 @@ document.getElementById('btn-github').onclick = () => {
   setStatus(`Connected to ${owner}/${name}. Save commits and Vercel redeploys automatically from now on.`, 'ok');
 };
 
-/* Commit one file through the GitHub contents API. */
-async function ghPut(path, contentB64, msg){
+/* Commit one file through the GitHub contents API. Retries once, with a
+   freshly re-fetched sha, if another commit landed in between (a race
+   between two saves, or a manual edit on GitHub) moved the file first. */
+async function ghPut(path, contentB64, msg, retrying){
   const url = `https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/${path}`;
   const head = {Authorization:'Bearer ' + gh.token, Accept:'application/vnd.github+json'};
   let sha;
-  const cur = await fetch(`${url}?ref=${gh.branch}`, {headers:head});
+  const cur = await fetch(`${url}?ref=${gh.branch}`, {headers:head, cache:'no-store'});
   if (cur.ok) sha = (await cur.json()).sha;
   const res = await fetch(url, {
     method:'PUT', headers:{...head, 'Content-Type':'application/json'},
     body: JSON.stringify({message:msg, content:contentB64, branch:gh.branch, ...(sha ? {sha} : {})})
   });
-  if (!res.ok) throw new Error(path + ': ' + (await res.json()).message);
+  if (!res.ok){
+    const errMsg = (await res.json()).message || '';
+    if (!retrying && /does not match|sha/i.test(errMsg)){
+      return ghPut(path, contentB64, msg, true);
+    }
+    throw new Error(path + ': ' + errMsg);
+  }
 }
 
 const b64 = str => btoa(String.fromCharCode(...new TextEncoder().encode(str)));
@@ -1183,10 +1191,13 @@ const fileB64 = file => new Promise(res => {
 });
 
 document.getElementById('btn-save').onclick = async () => {
+  const saveBtn = document.getElementById('btn-save');
+  if (saveBtn.disabled) return; // already committing — ignore a double-click/tap
   const html = buildHtml();
   const json = JSON.stringify(db, null, 2);
 
   if (gh){
+    saveBtn.disabled = true;
     setStatus('Committing…', '');
     try{
       await ghPut('index.html', b64(html), 'Update site');
@@ -1202,6 +1213,8 @@ document.getElementById('btn-save').onclick = async () => {
       }else{
         setStatus('GitHub said: ' + err.message, 'warn');
       }
+    }finally{
+      saveBtn.disabled = false;
     }
     return;
   }
