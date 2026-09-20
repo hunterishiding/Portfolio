@@ -46,7 +46,12 @@
       "subtitle": "Chefs y cocineros celebran su aniversario... ¿Qué significa para ti \"PDI\"?",
       "desc_en": "",
       "slug": "aniversario-gastro",
-      "subtitle_en": "Chefs and Cooks celebrate their anniversary... What does \"PDI\" mean to you?"
+      "subtitle_en": "Chefs and Cooks celebrate their anniversary... What does \"PDI\" mean to you?",
+      "credits": {
+        "gear": [],
+        "role": "Solo edité",
+        "role_en": "Edited only"
+      }
     },
     "gal-3": {
       "type": "gallery",
@@ -66,7 +71,18 @@
       "subtitle": "Celebrando el lugar que me ha dado las herramientas para la mayoría de mi trabajo!!!",
       "desc_en": "",
       "subtitle_en": "Celebrating the place that has given me the tools for most of my video work!!!",
-      "slug": "aniversario-cam"
+      "slug": "aniversario-cam",
+      "credits": {
+        "gear": [
+          {
+            "label": "",
+            "label_en": "",
+            "value": "Sony FX3"
+          }
+        ],
+        "role": "Capturé y edité",
+        "role_en": "Shot and edited"
+      }
     },
     "gal-5": {
       "type": "gallery",
@@ -77,7 +93,18 @@
       "media": [],
       "subtitle_en": "Highlights from a Youth Group Activity",
       "subtitle": "Highlights de un viaje de Pastoral Juvenil",
-      "slug": "el-picacho"
+      "slug": "el-picacho",
+      "credits": {
+        "gear": [
+          {
+            "label": "",
+            "label_en": "",
+            "value": "Nikon D5100"
+          }
+        ],
+        "role": "Solo capturé",
+        "role_en": "Shot only"
+      }
     },
     "gal-6": {
       "type": "gallery",
@@ -96,7 +123,18 @@
       ],
       "subtitle_en": "When you're on-set at a short film... Why not become BTS photographer?",
       "subtitle": "Cuando estás en el set de un cortometraje... ¿Porqué no convertirse en el fotógrafo del detrás de cámaras?",
-      "slug": "ai-vs-machine"
+      "slug": "ai-vs-machine",
+      "credits": {
+        "gear": [
+          {
+            "label": "",
+            "label_en": "",
+            "value": "Sony A7 IV"
+          }
+        ],
+        "role": "Capturé y edité",
+        "role_en": "Shot and edited"
+      }
     },
     "tile-sv": {
       "type": "gallery",
@@ -116,7 +154,18 @@
       ],
       "subtitle": "¿El reto? Capturar lo más bonito que veamos en este viaje familiar",
       "subtitle_en": "Current challenge: Capture the most beautiful things we see on this family trip",
-      "slug": "el-salvador"
+      "slug": "el-salvador",
+      "credits": {
+        "gear": [
+          {
+            "label": "",
+            "label_en": "",
+            "value": "Nikon D5100"
+          }
+        ],
+        "role": "Solo capturé",
+        "role_en": "Shot only"
+      }
     },
     "tile-bb": {
       "type": "gallery",
@@ -135,7 +184,18 @@
       ],
       "subtitle": "14 equipos, un solo trofeo. 🏀🔥 Así se vivió el torneo 3v3 de la Copa Jaguar",
       "slug": "basketball",
-      "subtitle_en": "14 teams, a single trophy. 🏀🔥 These are the highlights from UNITEC's Basketball Copa Jaguar 3v3"
+      "subtitle_en": "14 teams, a single trophy. 🏀🔥 These are the highlights from UNITEC's Basketball Copa Jaguar 3v3",
+      "credits": {
+        "gear": [
+          {
+            "label": "",
+            "label_en": "",
+            "value": "Sony FX3"
+          }
+        ],
+        "role": "Capturé y edité",
+        "role_en": "Shot and edited"
+      }
     },
     "gal-qcx1zz": {
       "type": "gallery",
@@ -157,7 +217,18 @@
       "banner": "assets/screenshot-2026-09-19-195539.png",
       "slug": "enfocus-2026",
       "desc_en": "Time travel, people 100% in costume, and the best projects of the major all in a single night. 📼✨ Between an opening dance straight out of Grease + Pulp Fiction and those who walked away crowned with their Enfocusito, this retro edition only confirmed one thing: every single hour of staying up late editing was totally worth it. 🎞️🍿",
-      "subtitle_en": "Awards ceremony at UNITEC... It's our version of the Oscars"
+      "subtitle_en": "Awards ceremony at UNITEC... It's our version of the Oscars",
+      "credits": {
+        "gear": [
+          {
+            "label": "",
+            "label_en": "",
+            "value": "Sony FX3"
+          }
+        ],
+        "role": "Capturé y edité",
+        "role_en": "Shot and edited"
+      }
     }
   }
 }
