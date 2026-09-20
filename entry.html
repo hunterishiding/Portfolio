@@ -91,6 +91,11 @@ nav.links a:hover{opacity:1;}
             grid-auto-rows:8px; column-gap:18px; align-items:start;}
 .m-item{margin:0; grid-row-end:span 30;}
 .m-item.full{grid-column:1 / -1;}
+/* A collection made only of embeds is centered instead of hugging the left column. */
+.media-grid.embeds-only{display:flex; flex-wrap:wrap; justify-content:center; gap:28px 22px;}
+.embeds-only .m-item{grid-row-end:auto !important; width:min(360px,100%); flex:0 0 auto;}
+.embeds-only .m-item.prov-youtube{width:min(760px,100%);}
+.embeds-only .m-item figcaption{text-align:center;}
 .m-item.half{grid-column:span 2;}
 .m-item img,
 .m-item video{width:100%; border-radius:6px; object-fit:cover; background:rgba(231,226,208,.07);}
@@ -99,9 +104,13 @@ nav.links a:hover{opacity:1;}
   background:rgba(231,226,208,.07); display:flex; align-items:center; justify-content:center;}
 .embed-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
 .embed-wrap.instagram{aspect-ratio:auto; background:none; display:block; overflow:visible;}
-.embed-wrap.instagram .ig-frame{position:static; display:block; width:100%; max-width:540px; min-width:0;
-  height:720px; margin:0 auto; border:0; border-radius:6px; background:#fff;}
-.embed-wrap.instagram .ig-open{display:block; text-align:center; margin-top:8px;}
+.embed-wrap.instagram .ig-frame{position:static; display:block; width:100%; max-width:360px; min-width:0;
+  height:680px; margin:0 auto; border:0; border-radius:10px; background:#fff;
+  box-shadow:0 8px 28px rgba(0,0,0,.35);}
+.embed-wrap.instagram .ig-open{display:block; width:max-content; margin:12px auto 0; padding:7px 16px;
+  border:1px solid rgba(231,226,208,.35); border-radius:999px; text-decoration:none; font-size:.8rem;
+  color:var(--cream); opacity:.85; transition:opacity .2s, background .2s;}
+.embed-wrap.instagram .ig-open:hover{opacity:1; background:rgba(231,226,208,.1);}
 .embed-wrap a{color:var(--sand); text-decoration:underline; font-size:.85rem;}
 
 /* ---------- Blog post body ---------- */
@@ -176,11 +185,11 @@ footer{background:var(--pine-deep); padding:18px 0;}
   <div class="nav-wrap">
     <a href="index.html"><img class="mark" src="assets/hunter-wordmark.png" alt="Hunter"></a>
     <nav class="links">
-      <a href="index.html#home">home</a>
-      <a href="index.html#gallery">gallery</a>
-      <a href="index.html#about">about</a>
-      <a href="index.html#notes">field notes</a>
-      <a href="index.html#contact">contact</a>
+      <a href="index.html#home" data-label="nav-home">home</a>
+      <a href="index.html#gallery" data-label="nav-gallery">gallery</a>
+      <a href="index.html#about" data-label="nav-about">about</a>
+      <a href="index.html#notes" data-label="nav-notes">field notes</a>
+      <a href="index.html#contact" data-label="nav-contact">contact</a>
     </nav>
     <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
   </div>
@@ -192,8 +201,8 @@ footer{background:var(--pine-deep); padding:18px 0;}
   <div class="footer-inner">
     <a href="index.html"><img class="mark" src="assets/hunter-wordmark.png" alt="Hunter"></a>
     <div class="footer-links">
-      <a href="index.html#contact">Contact</a>
-      <a id="ig" href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
+      <a href="index.html#contact" data-label="foot-contact">Contact</a>
+      <a id="ig" href="https://instagram.com/" target="_blank" rel="noopener" data-label="foot-instagram">Instagram</a>
     </div>
   </div>
 </footer>
@@ -239,10 +248,10 @@ function embedTag(m){
     // Instagram's embed.js builds behind the scenes, minus the script that
     // was deleting the placeholder when it choked on share-link URLs.
     return `<div class="embed-wrap instagram">
-      <iframe class="ig-frame" src="https://www.instagram.com/${ig.type}/${ig.code}/embed/captioned/"
+      <iframe class="ig-frame" src="https://www.instagram.com/${ig.type}/${ig.code}/embed/"
         title="Instagram post" loading="lazy" scrolling="no" allowtransparency="true"
         allow="encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-      <a class="ig-open" href="https://www.instagram.com/${ig.type}/${ig.code}/" target="_blank" rel="noopener">Open on Instagram ↗</a>
+      <a class="ig-open" href="https://www.instagram.com/${ig.type}/${ig.code}/" target="_blank" rel="noopener">Watch on Instagram ↗</a>
     </div>`;
   }
   return `<div class="embed-wrap"><a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a></div>`;
@@ -291,8 +300,9 @@ function renderCollection(e, lang){
   const subtitle = (lang === 'en' && e.subtitle_en) ? e.subtitle_en : e.subtitle;
   const desc     = (lang === 'en' && e.desc_en)     ? e.desc_en     : e.desc;
 
+  const onlyEmbeds = (e.media || []).length && (e.media || []).every(m => m.kind === 'embed');
   const items = (e.media || []).map(m => `
-    <figure class="m-item ${orientClass(m.orient)}"${m.kind === 'embed' ? '' : ' data-anim="up"'}>
+    <figure class="m-item ${orientClass(m.orient)} ${m.kind === 'embed' ? 'prov-' + (m.provider || 'link') : ''}"${m.kind === 'embed' ? '' : ' data-anim="up"'}>
       ${mediaTag(m)}
       ${m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : ''}
     </figure>`).join('');
@@ -311,7 +321,7 @@ function renderCollection(e, lang){
     <div class="collection">
       <div class="wrap">
         ${items
-          ? `<div class="media-grid">${items}</div>`
+          ? `<div class="media-grid${onlyEmbeds ? ' embeds-only' : ''}">${items}</div>`
           : `<div class="empty">No photos in this collection yet — add some in the editor.</div>`}
       </div>
     </div>`;
@@ -405,6 +415,20 @@ function layoutAndReveal(){
   }
 }
 
+/* ----- Menu + footer labels, edited in the editor and stored in data/entries.json ----- */
+function applyLabels(){
+  const L = (db.site && db.site.labels) || {};
+  document.querySelectorAll('[data-label]').forEach(el => {
+    const l = L[el.dataset.label];
+    if (!l) return;
+    const txt = (lang === 'en' && l.en) ? l.en : l.es;
+    if (txt) el.textContent = txt;
+    if (l.to){
+      el.setAttribute('href', /^(https?:|mailto:)/i.test(l.to) ? l.to : 'index.html#' + l.to);
+    }
+  });
+}
+
 /* ----- Static chrome translated by hand (data-en attributes) ----- */
 function applyStaticTranslations(lang){
   document.querySelectorAll('[data-en]').forEach(el => {
@@ -427,6 +451,7 @@ function currentLang(){
 let lang = currentLang();
 
 function renderAll(){
+  applyLabels();
   const e = db.entries && db.entries[id];
   if (!e) return notFound('That entry does not exist yet.');
 

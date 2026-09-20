@@ -216,12 +216,19 @@ let selBlock  = null;    // block selected in the site preview
 let selImg    = null;    // image selected in the site preview
 let selFigure = null;    // figure selected in the blog composer
 let selText   = null;    // text element focused for size/translation controls
+let selLabel  = null;    // button / menu link selected for label + destination controls
 
 const AR = [['Free',''],['1:1','1 / 1'],['4:3','4 / 3'],['3:2','3 / 2'],
             ['16:9','16 / 9'],['9:16','9 / 16'],['4:5','4 / 5']];
 const ANIMS = [['None',''],['Fade','fade'],['Up','up'],['Left','left'],['Right','right'],['Zoom','zoom']];
 
 const TEXT_SEL  = 'h1,h2,h3,p,figcaption,span.year,span.source,span.label,a.btn-outline,.contact-note';
+/* Buttons and menu links: click one in the preview to edit its words, its English
+   version and where it goes. (Clicking still switches pages so you can browse.) */
+const LABEL_SEL = 'nav.links button, .footer-links button, .footer-links a, button.btn-wide, button.btn-light, button.btn-dark';
+const VIEW_NAMES = [['home','Home'],['gallery','Gallery'],['about','About'],['notes','Field notes'],['contact','Contact']];
+const plainText = h => { const t = document.createElement('textarea'); t.innerHTML = h || ''; return t.value; };
+const curLang = () => (frame.contentWindow && frame.contentWindow.__siteLang) || 'es';
 const BLOCK_SEL = '.g-item,.note,.cred,.about-row,.tile,.hero,.welcome,.band,.sayhi';
 
 const uid = p => p + '-' + Math.random().toString(36).slice(2, 8);
@@ -366,6 +373,9 @@ function setupEditing(doc){
     .ed-text:hover{outline:1px dashed rgba(140,168,122,.85); outline-offset:3px; cursor:text;}
     .ed-text:focus{outline:2px solid #8CA87A; outline-offset:3px;}
     .ed-text.selt{outline:2px solid #8CA87A; outline-offset:3px;}
+    .ed-label{cursor:pointer;}
+    .ed-label:hover{outline:1px dashed rgba(140,168,122,.85); outline-offset:3px;}
+    .ed-label.selt{outline:2px solid #8CA87A; outline-offset:3px;}
     .ed-img{cursor:pointer;}
     .ed-img:hover,.ed-img.sel{outline:2px solid #8CA87A; outline-offset:2px;}
     .ed-block{position:relative;}
@@ -459,6 +469,15 @@ function setupEditing(doc){
   setupNew(doc);
 
   doc.addEventListener('click', e => {
+    if (!e.isTrusted) return;                 // ignore the editor's own programmatic clicks
+    const b = e.target.closest(LABEL_SEL);
+    const had = !!selLabel;
+    doc.querySelectorAll('.ed-label.selt').forEach(x => x.classList.remove('selt'));
+    if (b){ selLabel = b; selText = null; b.classList.add('selt'); homeControls(); }
+    else if (had){ selLabel = null; homeControls(); }
+  });
+
+  doc.addEventListener('click', e => {
     const a = e.target.closest('a');
     if (a) e.preventDefault();            // never navigate away mid-edit
   }, true);
@@ -467,12 +486,16 @@ function setupEditing(doc){
 
 /* Arm anything newly added or duplicated. */
 function setupNew(doc){
+  doc.querySelectorAll(LABEL_SEL).forEach(el => el.classList.add('ed-label'));
   doc.querySelectorAll(TEXT_SEL).forEach(el => {
     if (el.closest('[data-view]') || el.classList.contains('ed-text')) return;
     el.classList.add('ed-text');
     el.contentEditable = 'true';
     el.addEventListener('input', () => {
       markDirty();
+      // Keep the stored Spanish / English copies in step with what was typed.
+      if (el.dataset.en !== undefined && curLang() === 'en') el.dataset.en = el.innerHTML;
+      else if (el.dataset.esOrig !== undefined) el.dataset.esOrig = el.innerHTML;
       // Keep a card's title in step with its entry record.
       const b = el.closest('[data-entry]');
       if (b && el.tagName === 'H3' && db.entries[b.dataset.entry]){
@@ -483,6 +506,7 @@ function setupNew(doc){
     el.addEventListener('focus', () => {
       doc.querySelectorAll('.ed-text.selt').forEach(x => x.classList.remove('selt'));
       el.classList.add('selt');
+      selLabel = null; doc.querySelectorAll('.ed-label.selt').forEach(x => x.classList.remove('selt'));
       selText = el; homeControls();
     });
   });
@@ -586,6 +610,28 @@ function homeControls(){
     </div>`;
   }
 
+  if (selLabel){
+    const lEs = plainText(selLabel.dataset.esOrig !== undefined ? selLabel.dataset.esOrig : selLabel.innerHTML).trim();
+    const lEn = plainText(selLabel.dataset.en || '');
+    const lView = selLabel.dataset.view || '';
+    const secs = [...frame.contentDocument.querySelectorAll('section.view')].map(x => x.id);
+    const isA = selLabel.tagName === 'A';
+    html += `<div class="group"><h2>Button / link</h2>
+      <label class="field">Text</label>
+      <input class="field" data-lbl="es" value="${esc(lEs)}">
+      <label class="field">English version (optional)</label>
+      <input class="field" data-lbl="en" value="${esc(lEn)}" placeholder="Leave blank to use the same text in both languages">
+      ${lView ? `<label class="field">Goes to</label>
+      <select class="field" data-lbl="view">
+        ${VIEW_NAMES.filter(([v]) => secs.includes(v) || v === lView)
+          .map(([v, n]) => `<option value="${v}" ${v === lView ? 'selected' : ''}>${n}</option>`).join('')}
+      </select>` : ''}
+      ${isA ? `<label class="field">Link address</label>
+      <input class="field" data-lbl="href" value="${esc(selLabel.getAttribute('href') || '')}">` : ''}
+      <p class="hint">${selLabel.type === 'submit' ? 'This button sends the contact form, so it only has text.' : 'Menu and footer changes also apply to every collection and post page.'}</p>
+    </div>`;
+  }
+
   if (selBlock){
     const e = selBlock.dataset.entry ? db.entries[selBlock.dataset.entry] : null;
     html += `<div class="group"><h2>Selected block</h2>
@@ -613,9 +659,9 @@ function homeControls(){
     </div>`;
   }
 
-  if (!selImg && !selBlock && !selText){
+  if (!selImg && !selBlock && !selText && !selLabel){
     html += `<div class="group"><h2>Selection</h2>
-      <p class="sel-none">Click a photo to crop it, click text to resize or translate it, or click a section to retarget, resize, animate, move or delete it.</p></div>`;
+      <p class="sel-none">Click a photo to crop it, click text to resize or translate it, click a button or menu link to rename it or change where it goes, or click a section to retarget, resize, animate, move or delete it.</p></div>`;
   }
 
   html += `<div class="group"><h2>Site links</h2>
@@ -677,6 +723,44 @@ function wireHomeControls(){
     if (e.target.value.trim()) selText.dataset.en = e.target.value;
     else delete selText.dataset.en;
     markDirty();
+  });
+
+  /* ----- Button / menu link controls ----- */
+  const syncLabel = el => {
+    const key = el.dataset.label;
+    if (!key) return;                       // only menu + footer items are shared with entry pages
+    db.site = db.site || {}; db.site.labels = db.site.labels || {};
+    db.site.labels[key] = {
+      es: plainText(el.dataset.esOrig !== undefined ? el.dataset.esOrig : el.innerHTML).trim(),
+      en: plainText(el.dataset.en || '').trim(),
+      to: el.dataset.view || el.getAttribute('href') || ''
+    };
+  };
+  ctx.querySelector('[data-lbl="es"]')?.addEventListener('input', e => {
+    const el = selLabel, v = e.target.value;
+    el.dataset.esOrig = esc(v);
+    if (!(curLang() === 'en' && el.dataset.en)) el.innerHTML = esc(v);
+    syncLabel(el); markDirty();
+  });
+  ctx.querySelector('[data-lbl="en"]')?.addEventListener('input', e => {
+    const el = selLabel, v = e.target.value.trim();
+    if (el.dataset.esOrig === undefined) el.dataset.esOrig = el.innerHTML;
+    if (v) el.dataset.en = esc(v); else delete el.dataset.en;
+    el.innerHTML = (curLang() === 'en' && v) ? esc(v) : el.dataset.esOrig;
+    syncLabel(el); markDirty();
+  });
+  ctx.querySelector('[data-lbl="view"]')?.addEventListener('change', e => {
+    selLabel.dataset.view = e.target.value;
+    syncLabel(selLabel); markDirty();
+  });
+  ctx.querySelector('[data-lbl="href"]')?.addEventListener('input', e => {
+    const el = selLabel, v = e.target.value.trim();
+    el.setAttribute('href', v);
+    if (el.closest('.footer-links') && el.target === '_blank' && v){
+      db.site.instagram = v;
+      const box = document.getElementById('in-ig'); if (box) box.value = v;
+    }
+    syncLabel(el); markDirty();
   });
 
   ctx.querySelector('[data-blk="retarget"]')?.addEventListener('change', e => {
@@ -1156,9 +1240,15 @@ function buildHtml(){
     img.setAttribute('src', img.dataset.edSrc);
     img.removeAttribute('data-ed-src');
   });
+  // Always save the default-language text as the element's content, whatever
+  // language the preview happened to be showing, and drop the helper attribute.
+  root.querySelectorAll('[data-es-orig]').forEach(el => {
+    el.innerHTML = el.getAttribute('data-es-orig');
+    el.removeAttribute('data-es-orig');
+  });
   root.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-  root.querySelectorAll('.ed-text,.ed-img,.ed-block,.ed-hover,.sel,.cover-link').forEach(el => {
-    el.classList.remove('ed-text','ed-img','ed-block','ed-hover','sel','cover-link');
+  root.querySelectorAll('.ed-text,.ed-img,.ed-block,.ed-hover,.ed-label,.selt,.sel,.cover-link').forEach(el => {
+    el.classList.remove('ed-text','ed-img','ed-block','ed-hover','ed-label','selt','sel','cover-link');
     if (!el.classList.length) el.removeAttribute('class');
   });
   root.querySelectorAll('[style]').forEach(el => {
