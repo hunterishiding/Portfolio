@@ -31,21 +31,21 @@
           "kind": "embed",
           "url": "https://www.instagram.com/reel/Db-2dpltTKV/?utm_source=ig_web_button_share_sheet&stkn=MzRlODBiNWFlZA==",
           "provider": "instagram",
-          "caption": "Share link",
+          "caption": "",
           "orient": ""
         },
         {
           "kind": "embed",
           "url": "https://www.instagram.com/reel/Db-2dpltTKV/?utm_source=ig_embed&amp;utm_campaign=loading",
           "provider": "instagram",
-          "caption": "EMBED code",
+          "caption": "",
           "orient": ""
         },
         {
           "kind": "embed",
           "url": "https://www.instagram.com/p/Db-2dpltTKV/",
           "provider": "instagram",
-          "caption": "search bar link",
+          "caption": "",
           "orient": ""
         }
       ]
