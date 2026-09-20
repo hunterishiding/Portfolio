@@ -198,8 +198,8 @@
     },
     "tile-bb": {
       "type": "gallery",
-      "title": "Basketball",
-      "year": "",
+      "title": "Basketball Copa Jaguar 3v3",
+      "year": "2026",
       "desc": "",
       "cover": "assets/basketball.jpg",
       "media": [
@@ -210,7 +210,8 @@
           "caption": "",
           "orient": ""
         }
-      ]
+      ],
+      "subtitle": "14 equipos, un solo trofeo. 🏀🔥 Así se vivió el torneo 3v3 de la Copa Jaguar"
     },
     "gal-qcx1zz": {
       "type": "gallery",
