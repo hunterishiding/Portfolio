@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="es"><head>
+
 
 
 
@@ -525,13 +526,13 @@ footer{background:var(--pine-deep); padding:18px 0;}
       <img class="mark" src="assets/hunter-wordmark.png" alt="Hunter">
     </button>
     <nav class="links">
-      <button data-view="home" class="active" data-label="nav-home">home</button>
-      <button data-view="gallery" class="" data-label="nav-gallery">gallery</button>
-      <button data-view="about" class="" data-label="nav-about">about</button>
-      <button data-view="notes" class="" data-label="nav-notes">field notes</button>
-      <button data-view="contact" data-label="nav-contact">contact</button>
+      <button data-view="home" data-label="nav-home" data-en="home" class="active">inicio</button>
+      <button data-view="gallery" data-label="nav-gallery" data-en="gallery">galería</button>
+      <button data-view="about" data-label="nav-about" data-en="about">sobre mí</button>
+      <button data-view="notes" data-label="nav-notes" data-en="field notes">bitácora</button>
+      <button data-view="contact" data-label="nav-contact" class="" data-en="contact">contacto</button>
     </nav>
-    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">EN</button>
+    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
   </div>
 </header>
 
@@ -544,7 +545,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
   <!-- Hero -->
   <div class="hero shown">
     <div class="hero-inner">
-      <img class="hero-avatar" src="assets/avatar.png" alt="Pixel-art portrait of Hunter holding a camera">
+      <img class="hero-avatar" src="assets/avatar.png" alt="Pixel-art portrait of Hunter holding a camera" style="object-position:50% 0%">
       <div class="hero-copy">
         <p class="greeting">Hey, I'm</p>
         <img class="wordmark" src="assets/hunter-wordmark.png" alt="Hunter">
@@ -870,7 +871,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
       <img class="mark" src="assets/hunter-wordmark.png" alt="Hunter">
     </button>
     <div class="footer-links">
-      <button data-view="contact" data-label="foot-contact">Contact</button>
+      <button data-view="contact" data-label="foot-contact" data-en="Contact">Contacto</button>
       <a href="https://instagram.com/hunterwashiding" target="_blank" rel="noopener" data-label="foot-instagram">Instagram</a>
     </div>
   </div>
@@ -1001,7 +1002,8 @@ document.getElementById('contact-form').addEventListener('submit', e => {
 
 
 
-<div id="ed-resize" style="display: none; top: 754.592px; left: 898.75px;"></div>
+<div id="ed-resize" style="display: block; top: -8px; left: -8px;"></div>
+<div id="ed-resize"></div>
 <div id="ed-resize"></div>
 <div id="ed-resize"></div>
 <div id="ed-resize"></div></body></html>
