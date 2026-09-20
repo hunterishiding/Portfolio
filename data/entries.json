@@ -211,6 +211,24 @@
           "orient": ""
         }
       ]
+    },
+    "gal-qcx1zz": {
+      "type": "gallery",
+      "title": "ENFOCUS 2026",
+      "year": "2026",
+      "desc": "",
+      "cover": "",
+      "media": [
+        {
+          "kind": "embed",
+          "url": "https://www.instagram.com/reel/DdfNPPPMHZf/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==",
+          "provider": "instagram",
+          "caption": "",
+          "orient": ""
+        }
+      ],
+      "title_en": "ENFOCUS 2026",
+      "subtitle": "Viaje en el tiempo, gente disfrazada al 100% y los mejores proyectos de la carrera en una sola noche. 📼✨ Entre el baile de opening a lo Grease + Pulp Fiction y los que salieron coronados con su Enfocusito, esta edición retro solo confirmó una cosa: valió la pena cada hora de desvelo editando. 🎞️🍿"
     }
   }
 }
