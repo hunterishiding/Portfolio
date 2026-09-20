@@ -40,11 +40,13 @@
       "type": "gallery",
       "title": "X Aniversario de Gastronomía",
       "year": "2026",
-      "desc": "One-line description of the shoot — what it was, where it was, and what you were going for.",
+      "desc": "",
       "cover": "assets/screenshot-2026-09-15-153907.png",
       "media": [],
       "subtitle": "Chefs y cocineros celebran su aniversario... ¿Qué significa para ti \"PDI\"?",
-      "desc_en": "Chefs and Cooks celebrate their anniversary... What does \"PDI\" mean to you?"
+      "desc_en": "",
+      "slug": "aniversario-gastro",
+      "subtitle_en": "Chefs and Cooks celebrate their anniversary... What does \"PDI\" mean to you?"
     },
     "gal-3": {
       "type": "gallery",
@@ -63,7 +65,8 @@
       ],
       "subtitle": "Celebrando el lugar que me ha dado las herramientas para la mayoría de mi trabajo!!!",
       "desc_en": "",
-      "subtitle_en": "Celebrating the place that has given me the tools for most of my video work!!!"
+      "subtitle_en": "Celebrating the place that has given me the tools for most of my video work!!!",
+      "slug": "aniversario-cam"
     },
     "gal-5": {
       "type": "gallery",
@@ -73,7 +76,8 @@
       "cover": "assets/dsc-1624.jpg",
       "media": [],
       "subtitle_en": "Highlights from a Youth Group Activity",
-      "subtitle": "Highlights de un viaje de Pastoral Juvenil"
+      "subtitle": "Highlights de un viaje de Pastoral Juvenil",
+      "slug": "el-picacho"
     },
     "gal-6": {
       "type": "gallery",
@@ -91,7 +95,8 @@
         }
       ],
       "subtitle_en": "When you're on-set at a short film... Why not become BTS photographer?",
-      "subtitle": "Cuando estás en el set de un cortometraje... ¿Porqué no convertirse en el fotógrafo del detrás de cámaras?"
+      "subtitle": "Cuando estás en el set de un cortometraje... ¿Porqué no convertirse en el fotógrafo del detrás de cámaras?",
+      "slug": "ai-vs-machine"
     },
     "tile-sv": {
       "type": "gallery",
@@ -110,7 +115,8 @@
         }
       ],
       "subtitle": "¿El reto? Capturar lo más bonito que veamos en este viaje familiar",
-      "subtitle_en": "Current challenge: Capture the most beautiful things we see on this family trip"
+      "subtitle_en": "Current challenge: Capture the most beautiful things we see on this family trip",
+      "slug": "el-salvador"
     },
     "tile-bb": {
       "type": "gallery",
@@ -127,13 +133,15 @@
           "orient": ""
         }
       ],
-      "subtitle": "14 equipos, un solo trofeo. 🏀🔥 Así se vivió el torneo 3v3 de la Copa Jaguar"
+      "subtitle": "14 equipos, un solo trofeo. 🏀🔥 Así se vivió el torneo 3v3 de la Copa Jaguar",
+      "slug": "basketball",
+      "subtitle_en": "14 teams, a single trophy. 🏀🔥 These are the highlights from UNITEC's Basketball Copa Jaguar 3v3"
     },
     "gal-qcx1zz": {
       "type": "gallery",
       "title": "ENFOCUS 2026",
       "year": "2026",
-      "desc": "",
+      "desc": "Viaje en el tiempo, gente disfrazada al 100% y los mejores proyectos de la carrera en una sola noche. 📼✨ Entre el baile de opening a lo Grease + Pulp Fiction y los que salieron coronados con su Enfocusito, esta edición retro solo confirmó una cosa: valió la pena cada hora de desvelo editando. 🎞️🍿",
       "cover": "assets/screenshot-2026-09-19-195539.png",
       "media": [
         {
@@ -145,8 +153,11 @@
         }
       ],
       "title_en": "ENFOCUS 2026",
-      "subtitle": "Viaje en el tiempo, gente disfrazada al 100% y los mejores proyectos de la carrera en una sola noche. 📼✨ Entre el baile de opening a lo Grease + Pulp Fiction y los que salieron coronados con su Enfocusito, esta edición retro solo confirmó una cosa: valió la pena cada hora de desvelo editando. 🎞️🍿",
-      "banner": "assets/screenshot-2026-09-19-195539.png"
+      "subtitle": "Ceremonia de Premiación de la carrera de Comunicación Estratégica y Audiovisual de UNITEC. Son nuestros Oscars",
+      "banner": "assets/screenshot-2026-09-19-195539.png",
+      "slug": "enfocus-2026",
+      "desc_en": "Time travel, people 100% in costume, and the best projects of the major all in a single night. 📼✨ Between an opening dance straight out of Grease + Pulp Fiction and those who walked away crowned with their Enfocusito, this retro edition only confirmed one thing: every single hour of staying up late editing was totally worth it. 🎞️🍿",
+      "subtitle_en": "Awards ceremony at UNITEC... It's our version of the Oscars"
     }
   }
 }
