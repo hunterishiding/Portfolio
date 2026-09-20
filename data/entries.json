@@ -4,14 +4,6 @@
     "email": "g.alessandroerazo@gmail.com"
   },
   "entries": {
-    "gal-1": {
-      "type": "gallery",
-      "title": "Basketball Copa Jaguar obsolete",
-      "year": "2026",
-      "desc": "An idea that turned into reality exactly how I imagined it.",
-      "cover": "assets/basketball.jpg",
-      "media": []
-    },
     "gal-2": {
       "type": "gallery",
       "title": "X Aniversario de Gastronomía",
@@ -35,14 +27,6 @@
           "orient": ""
         }
       ]
-    },
-    "gal-4": {
-      "type": "gallery",
-      "title": "El Salvador obsolete",
-      "year": "2026",
-      "desc": "Current challenge: Capture what's most relevant on this family trip",
-      "cover": "assets/dsc-2069.jpg",
-      "media": []
     },
     "gal-5": {
       "type": "gallery",
@@ -212,7 +196,8 @@
         }
       ],
       "title_en": "ENFOCUS 2026",
-      "subtitle": "Viaje en el tiempo, gente disfrazada al 100% y los mejores proyectos de la carrera en una sola noche. 📼✨ Entre el baile de opening a lo Grease + Pulp Fiction y los que salieron coronados con su Enfocusito, esta edición retro solo confirmó una cosa: valió la pena cada hora de desvelo editando. 🎞️🍿"
+      "subtitle": "Viaje en el tiempo, gente disfrazada al 100% y los mejores proyectos de la carrera en una sola noche. 📼✨ Entre el baile de opening a lo Grease + Pulp Fiction y los que salieron coronados con su Enfocusito, esta edición retro solo confirmó una cosa: valió la pena cada hora de desvelo editando. 🎞️🍿",
+      "banner": "assets/screenshot-2026-09-19-195539.png"
     }
   }
 }
