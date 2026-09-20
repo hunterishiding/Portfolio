@@ -42,13 +42,15 @@
       "year": "2026",
       "desc": "One-line description of the shoot — what it was, where it was, and what you were going for.",
       "cover": "assets/screenshot-2026-09-15-153907.png",
-      "media": []
+      "media": [],
+      "subtitle": "Chefs y cocineros celebran su aniversario... ¿Qué significa para ti \"PDI\"?",
+      "desc_en": "Chefs and Cooks celebrate their anniversary... What does \"PDI\" mean to you?"
     },
     "gal-3": {
       "type": "gallery",
       "title": "XV Aniversario del CAM",
       "year": "2026",
-      "desc": "One-line description of the shoot — what it was, where it was, and what you were going for.",
+      "desc": "",
       "cover": "assets/xv-del-cam.jpg",
       "media": [
         {
@@ -58,21 +60,26 @@
           "caption": "Instagram Embed",
           "orient": ""
         }
-      ]
+      ],
+      "subtitle": "Celebrando el lugar que me ha dado las herramientas para la mayoría de mi trabajo!!!",
+      "desc_en": "",
+      "subtitle_en": "Celebrating the place that has given me the tools for most of my video work!!!"
     },
     "gal-5": {
       "type": "gallery",
       "title": "El Picacho",
       "year": "2026",
-      "desc": "Highlights from a Youth Group Activity",
+      "desc": "",
       "cover": "assets/dsc-1624.jpg",
-      "media": []
+      "media": [],
+      "subtitle_en": "Highlights from a Youth Group Activity",
+      "subtitle": "Highlights de un viaje de Pastoral Juvenil"
     },
     "gal-6": {
       "type": "gallery",
       "title": "AI vs Machine",
       "year": "2025",
-      "desc": "When you're on-set at a short film... Why not become BTS photographer?",
+      "desc": "",
       "cover": "assets/dsc02404.jpg",
       "media": [
         {
@@ -82,7 +89,9 @@
           "caption": "AI vs Machine",
           "orient": ""
         }
-      ]
+      ],
+      "subtitle_en": "When you're on-set at a short film... Why not become BTS photographer?",
+      "subtitle": "Cuando estás en el set de un cortometraje... ¿Porqué no convertirse en el fotógrafo del detrás de cámaras?"
     },
     "tile-sv": {
       "type": "gallery",
@@ -99,7 +108,9 @@
           "ar": "",
           "pos": "50% 50%"
         }
-      ]
+      ],
+      "subtitle": "¿El reto? Capturar lo más bonito que veamos en este viaje familiar",
+      "subtitle_en": "Current challenge: Capture the most beautiful things we see on this family trip"
     },
     "tile-bb": {
       "type": "gallery",
