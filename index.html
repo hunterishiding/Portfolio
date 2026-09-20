@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es"><head>
+<html lang="en"><head>
+
 
 
 
@@ -532,12 +533,12 @@ footer{background:var(--pine-deep); padding:18px 0;}
     </button>
     <nav class="links">
       <button data-view="home" data-label="nav-home" data-en="home" class="active">inicio</button>
-      <button data-view="gallery" class="" data-label="nav-gallery" data-en="gallery">galería</button>
+      <button data-view="gallery" data-label="nav-gallery" data-en="gallery">galería</button>
       <button data-view="about" data-label="nav-about" data-en="about">sobre mí</button>
       <button data-view="notes" data-label="nav-notes" data-en="field notes">bitácora</button>
-      <button data-view="contact" data-label="nav-contact" data-en="contact">contacto</button>
+      <button data-view="contact" data-label="nav-contact" data-en="contact" class="">contacto</button>
     </nav>
-    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
+    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">EN</button>
   </div>
 </header>
 
@@ -838,7 +839,7 @@ hear from you!" data-i18n="custom.akiqg6">Me emociona escuchar tus ideas!</h1>
           <textarea id="msg" placeholder="Write your message here..." required=""></textarea>
           <button type="submit" class="btn-wide" data-en="Send Message" data-i18n="custom.j87p2s">Enviar mensaje</button>
         </form>
-        <p class="contact-note" data-en="Or email me directly at g.alessandroerazo@gmail.com." data-i18n="custom.e52hqb">Or email me directly at <a href="mailto:g.alessandroerazo@gmail.com">g.alessandroerazo@gmail.com</a>.</p>
+        <p class="contact-note" data-en="Or email me directly at&amp;nbsp;&lt;span class=&quot;inline-flex flex-wrap items-center gap-1.5&quot;&gt;&lt;span&gt;contact@hunterwashiding.com&lt;/span&gt;&lt;/span&gt;" data-i18n="custom.e52hqb">Or email me directly at <a href="mailto:contact@hunterwashiding.com">g.alessandroerazo@gmail.com</a>.</p>
       </div>
     </div>
   </div>
@@ -1022,7 +1023,7 @@ if (animated.length && 'IntersectionObserver' in window) {
 document.getElementById('contact-form').addEventListener('submit', e => {
   e.preventDefault();
   const body = encodeURIComponent(document.getElementById('msg').value);
-  window.location.href = `mailto:g.alessandroerazo@gmail.com?subject=Hello%20from%20razorbill.studio&body=${body}`;
+  window.location.href = `mailto:contact@hunterwashiding.com?subject=Hello%20from%20razorbill.studio&body=${body}`;
 });
 </script>
 
@@ -1040,4 +1041,5 @@ document.getElementById('contact-form').addEventListener('submit', e => {
 <div id="ed-resize"></div>
 <div id="ed-resize"></div><script src="assets/texture.js" defer=""></script>
 
+<div id="ed-resize"></div>
 <div id="ed-resize"></div></body></html>
