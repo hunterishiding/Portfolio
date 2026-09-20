@@ -231,7 +231,9 @@ function embedTag(m){
   }
   if (m.provider === 'instagram'){
     return `<div class="embed-wrap instagram"><blockquote class="instagram-media"
-      data-instgrm-permalink="${esc(url)}" style="width:100%;"></blockquote></div>`;
+      data-instgrm-permalink="${esc(url)}" data-instgrm-version="14" style="width:100%; margin:0;">
+      <a href="${esc(url)}" target="_blank" rel="noopener">View this post on Instagram</a>
+    </blockquote></div>`;
   }
   return `<div class="embed-wrap"><a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a></div>`;
 }
