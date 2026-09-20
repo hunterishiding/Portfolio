@@ -10,12 +10,7 @@
       "year": "2026",
       "desc": "An idea that turned into reality exactly how I imagined it.",
       "cover": "assets/basketball.jpg",
-      "media": [],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      "media": []
     },
     "gal-2": {
       "type": "gallery",
@@ -23,12 +18,7 @@
       "year": "2026",
       "desc": "One-line description of the shoot — what it was, where it was, and what you were going for.",
       "cover": "assets/screenshot-2026-09-15-153907.png",
-      "media": [],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      "media": []
     },
     "gal-3": {
       "type": "gallery",
@@ -36,12 +26,29 @@
       "year": "2026",
       "desc": "One-line description of the shoot — what it was, where it was, and what you were going for.",
       "cover": "assets/xv-del-cam.jpg",
-      "media": [],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      "media": [
+        {
+          "kind": "embed",
+          "url": "https://www.instagram.com/reel/Db-2dpltTKV/",
+          "provider": "instagram",
+          "caption": "",
+          "orient": ""
+        },
+        {
+          "kind": "embed",
+          "url": "https://www.instagram.com/reel/Db-2dpltTKV/",
+          "provider": "instagram",
+          "caption": "",
+          "orient": ""
+        },
+        {
+          "kind": "embed",
+          "url": "https://www.instagram.com/p/Db-2dpltTKV/",
+          "provider": "instagram",
+          "caption": "",
+          "orient": ""
+        }
+      ]
     },
     "gal-4": {
       "type": "gallery",
@@ -49,12 +56,7 @@
       "year": "2026",
       "desc": "Current challenge: Capture what's most relevant on this family trip",
       "cover": "assets/dsc-2069.jpg",
-      "media": [],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      "media": []
     },
     "gal-5": {
       "type": "gallery",
@@ -62,12 +64,7 @@
       "year": "2026",
       "desc": "Highlights from a Youth Group Activity",
       "cover": "assets/dsc-1624.jpg",
-      "media": [],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      "media": []
     },
     "gal-6": {
       "type": "gallery",
@@ -84,12 +81,7 @@
           "ar": "",
           "pos": "50% 50%"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      ]
     },
     "note-1": {
       "type": "note",
@@ -113,11 +105,7 @@
           "t": "rich",
           "html": "<blockquote>Wait for the fog to lift, then wait a little longer.</blockquote>"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "category_en": "",
-      "blocks_en": []
+      ]
     },
     "note-2": {
       "type": "note",
@@ -131,11 +119,7 @@
           "t": "rich",
           "html": "<p>Write your post here.</p>"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "category_en": "",
-      "blocks_en": []
+      ]
     },
     "note-3": {
       "type": "note",
@@ -149,11 +133,7 @@
           "t": "rich",
           "html": "<p>Write your post here.</p>"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "category_en": "",
-      "blocks_en": []
+      ]
     },
     "note-4": {
       "type": "note",
@@ -167,11 +147,7 @@
           "t": "rich",
           "html": "<p>Write your post here.</p>"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "category_en": "",
-      "blocks_en": []
+      ]
     },
     "note-5": {
       "type": "note",
@@ -185,11 +161,7 @@
           "t": "rich",
           "html": "<p>Write your post here.</p>"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "category_en": "",
-      "blocks_en": []
+      ]
     },
     "note-6": {
       "type": "note",
@@ -203,11 +175,7 @@
           "t": "rich",
           "html": "<p>Write your post here.</p>"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "category_en": "",
-      "blocks_en": []
+      ]
     },
     "tile-xv": {
       "type": "gallery",
@@ -232,12 +200,7 @@
           "ar": "",
           "pos": "50% 50%"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      ]
     },
     "tile-ai": {
       "type": "gallery",
@@ -254,12 +217,7 @@
           "ar": "",
           "pos": "50% 50%"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      ]
     },
     "tile-sv": {
       "type": "gallery",
@@ -276,12 +234,7 @@
           "ar": "",
           "pos": "50% 50%"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      ]
     },
     "tile-bb": {
       "type": "gallery",
@@ -298,12 +251,7 @@
           "ar": "",
           "pos": "50% 50%"
         }
-      ],
-      "title_en": "",
-      "desc_en": "",
-      "subtitle": "",
-      "subtitle_en": "",
-      "banner": ""
+      ]
     }
   }
 }
