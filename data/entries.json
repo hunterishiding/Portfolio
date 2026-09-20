@@ -162,23 +162,6 @@
         }
       ]
     },
-    "tile-ai": {
-      "type": "gallery",
-      "title": "AI vs Machine obsolete",
-      "year": "",
-      "desc": "",
-      "cover": "assets/ai-vs-machine.jpg",
-      "media": [
-        {
-          "src": "assets/ai-vs-machine.jpg",
-          "orient": "h",
-          "caption": "",
-          "alt": "AI vs Machine",
-          "ar": "",
-          "pos": "50% 50%"
-        }
-      ]
-    },
     "tile-sv": {
       "type": "gallery",
       "title": "El Salvador",
