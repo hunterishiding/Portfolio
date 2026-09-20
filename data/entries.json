@@ -162,31 +162,6 @@
         }
       ]
     },
-    "tile-xv": {
-      "type": "gallery",
-      "title": "XV del CAM",
-      "year": "2026",
-      "desc": "",
-      "cover": "assets/xv-del-cam.jpg",
-      "media": [
-        {
-          "src": "assets/xv-del-cam.jpg",
-          "orient": "",
-          "caption": "",
-          "alt": "XV del CAM",
-          "ar": "",
-          "pos": "50% 50%"
-        },
-        {
-          "src": "assets/xv-cam.mov",
-          "orient": "full",
-          "caption": "",
-          "alt": "",
-          "ar": "",
-          "pos": "50% 50%"
-        }
-      ]
-    },
     "tile-ai": {
       "type": "gallery",
       "title": "AI vs Machine",
@@ -229,12 +204,11 @@
       "cover": "assets/basketball.jpg",
       "media": [
         {
-          "src": "assets/basketball.jpg",
-          "orient": "h",
+          "kind": "embed",
+          "url": "https://www.instagram.com/reel/Dc7fO86xJ3c/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==",
+          "provider": "instagram",
           "caption": "",
-          "alt": "Basketball",
-          "ar": "",
-          "pos": "50% 50%"
+          "orient": ""
         }
       ]
     }
