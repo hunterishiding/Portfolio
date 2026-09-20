@@ -1,7 +1,7 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/work/:id", "destination": "/entry.html?id=:id" },
-    { "source": "/notes/:id", "destination": "/entry.html?id=:id" }
+    { "source": "/work/:id", "destination": "/entry" },
+    { "source": "/notes/:id", "destination": "/entry" }
   ]
 }
