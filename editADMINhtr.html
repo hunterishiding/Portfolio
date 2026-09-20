@@ -226,6 +226,16 @@ const BLOCK_SEL = '.g-item,.note,.cred,.about-row,.tile,.hero,.welcome,.band,.sa
 
 const uid = p => p + '-' + Math.random().toString(36).slice(2, 8);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function extractEmbedUrl(text){
+  text = (text || '').trim();
+  const iframeSrc = text.match(/<iframe[^>]*\bsrc=["']([^"']+)["']/i);
+  if (iframeSrc) return iframeSrc[1];
+  const igPermalink = text.match(/data-instgrm-permalink=["']([^"']+)["']/i);
+  if (igPermalink) return igPermalink[1];
+  const anchorHref = text.match(/<a[^>]*\bhref=["']([^"']+)["']/i);
+  if (anchorHref) return anchorHref[1];
+  return text;
+}
 
 function setStatus(m, k){ statusEl.textContent = m; statusEl.className = k || ''; }
 if (gh) setStatus(`Connected to ${gh.owner}/${gh.repo}. Save commits and Vercel redeploys.`, 'ok');
@@ -367,7 +377,9 @@ function setupEditing(doc){
     #ed-tools button{background:none; border:none; color:#E7E2D0; cursor:pointer;
       font:600 11px/1 Montserrat,sans-serif; padding:6px 8px; border-radius:4px;}
     #ed-tools button:hover{background:rgba(231,226,208,.16);}
-    #ed-tools button.del:hover{background:#C97B5A; color:#152019;}`;
+    #ed-tools button.del:hover{background:#C97B5A; color:#152019;}
+    #ed-resize{position:absolute; z-index:9999; display:none; width:16px; height:16px;
+      background:#8CA87A; border:2px solid #152019; border-radius:4px; cursor:ew-resize;}`;
   doc.head.appendChild(st);
 
   const tools = doc.createElement('div');
@@ -376,6 +388,42 @@ function setupEditing(doc){
     .map(x => { const [a,l] = x.split(':');
       return `<button data-act="${a}" class="${a === 'del' ? 'del' : ''}">${l}</button>`; }).join('');
   doc.body.appendChild(tools);
+
+  // Drag the block's right edge to resize it, instead of picking a percent
+  // from a list — the block stays centered as it shrinks or grows.
+  const resize = doc.createElement('div');
+  resize.id = 'ed-resize';
+  doc.body.appendChild(resize);
+
+  let dragging = null;
+  resize.addEventListener('mousedown', e => {
+    if (!selBlock) return;
+    e.preventDefault(); e.stopPropagation();
+    dragging = {
+      startX: e.clientX,
+      startWidth: selBlock.getBoundingClientRect().width,
+      parentWidth: selBlock.parentElement.getBoundingClientRect().width
+    };
+  });
+  doc.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = (e.clientX - dragging.startX) * 2; // both margins move together once centered
+    let pct = Math.round(((dragging.startWidth + dx) / dragging.parentWidth) * 100);
+    pct = Math.max(20, Math.min(100, pct));
+    if (pct >= 99){
+      selBlock.style.removeProperty('max-width');
+      selBlock.style.removeProperty('margin-left');
+      selBlock.style.removeProperty('margin-right');
+    }else{
+      selBlock.style.maxWidth = pct + '%';
+      selBlock.style.marginLeft = 'auto';
+      selBlock.style.marginRight = 'auto';
+    }
+    positionResizeHandle();
+  });
+  doc.addEventListener('mouseup', () => {
+    if (dragging){ dragging = null; markDirty(); }
+  });
 
   tools.onclick = e => {
     const act = e.target.dataset.act, el = tools._t;
@@ -468,6 +516,17 @@ function setupNew(doc){
   });
 }
 
+function positionResizeHandle(){
+  const doc = frame.contentDocument;
+  const handle = doc?.getElementById('ed-resize');
+  if (!handle) return;
+  if (!selBlock){ handle.style.display = 'none'; return; }
+  const r = selBlock.getBoundingClientRect();
+  handle.style.display = 'block';
+  handle.style.top  = (r.top + doc.defaultView.scrollY + r.height / 2 - 8) + 'px';
+  handle.style.left = (r.right + doc.defaultView.scrollX - 8) + 'px';
+}
+
 function selectImage(el, doc){
   doc.querySelectorAll('.ed-img.sel').forEach(x => x.classList.remove('sel'));
   el.classList.add('sel');
@@ -529,8 +588,6 @@ function homeControls(){
 
   if (selBlock){
     const e = selBlock.dataset.entry ? db.entries[selBlock.dataset.entry] : null;
-    const curW = (selBlock.style.maxWidth || '100%').trim();
-    const WIDTHS = [['Full','100%'],['75%','75%'],['50%','50%'],['33%','33%']];
     html += `<div class="group"><h2>Selected block</h2>
       ${e ? `<label class="field">Links to</label>
       <select class="field" data-blk="retarget">
@@ -546,10 +603,7 @@ function homeControls(){
         ${['left','center','right'].map(a =>
           `<button class="btn" data-align="${a}">${a}</button>`).join('')}
       </div>
-      <label class="field">Size</label>
-      <select class="field" data-blk="width">
-        ${WIDTHS.map(([l, v]) => `<option value="${v}" ${curW === v ? 'selected' : ''}>${l}</option>`).join('')}
-      </select>
+      <p class="hint">Drag the green handle on the block's right edge to resize it.</p>
       <div class="row">
         <button class="btn" data-blk="up">Move up</button>
         <button class="btn" data-blk="down">Move down</button>
@@ -573,12 +627,13 @@ function homeControls(){
   <div class="group"><h2>How to use</h2>
     <p class="hint"><b>Text</b> — click and type; click again to size or translate it.<br>
     <b>Photos</b> — click to select, then crop.<br>
-    <b>Blocks</b> — hover for move, duplicate, open and delete; click to resize, retarget or animate.<br>
+    <b>Blocks</b> — hover for move, duplicate, open and delete; click to select, then drag its edge to resize.<br>
     <b>Pages</b> — the rail on the left.</p>
   </div>`;
 
   ctx.innerHTML = html;
   wireHomeControls();
+  positionResizeHandle();
 }
 
 function wireHomeControls(){
@@ -632,18 +687,6 @@ function wireHomeControls(){
     });
     markDirty(); renderLayers(); homeControls();
   });
-  ctx.querySelector('[data-blk="width"]')?.addEventListener('change', e => {
-    if (e.target.value && e.target.value !== '100%'){
-      selBlock.style.maxWidth = e.target.value;
-      selBlock.style.marginLeft = 'auto'; selBlock.style.marginRight = 'auto';
-    }else{
-      selBlock.style.removeProperty('max-width');
-      selBlock.style.removeProperty('margin-left');
-      selBlock.style.removeProperty('margin-right');
-    }
-    markDirty();
-  });
-
   ctx.querySelector('[data-blk="anim"]')?.addEventListener('change', e => {
     if (e.target.value) selBlock.dataset.anim = e.target.value;
     else selBlock.removeAttribute('data-anim');
@@ -841,10 +884,11 @@ function entryMetaControls(id, e){
       markDirty(); renderCollectionEditor(id, e); renderLayers();
     }));
   ctx.querySelector('[data-act="add-embed"]')?.addEventListener('click', () => {
-    const url = prompt('Paste an Instagram or YouTube link:');
-    if (!url) return;
+    const raw = prompt('Paste an Instagram or YouTube link (or the "embed code" if that\'s what you copied):');
+    if (!raw) return;
+    const url = extractEmbedUrl(raw);
     const provider = /youtu\.?be/i.test(url) ? 'youtube' : (/instagram\.com/i.test(url) ? 'instagram' : 'link');
-    e.media.push({kind:'embed', url:url.trim(), provider, caption:'', orient:''});
+    e.media.push({kind:'embed', url, provider, caption:'', orient:''});
     markDirty(); renderCollectionEditor(id, e); renderLayers();
   });
   ctx.querySelector('[data-act="add-fig"]')?.addEventListener('click',
@@ -937,7 +981,7 @@ function renderCollectionEditor(id, e){
     const t = ev.target, i = +t.dataset.i;
     if (t.dataset.cap) { e.media[i].caption = t.value; markDirty(); }
     if (t.dataset.ar)  { e.media[i].ar = t.value; markDirty(); }
-    if (t.dataset.url) { e.media[i].url = t.value; markDirty(); }
+    if (t.dataset.url) { e.media[i].url = extractEmbedUrl(t.value); markDirty(); }
     if (t.dataset.px || t.dataset.py){
       const cur = (e.media[i].pos || '50% 50%').split(/\s+/);
       if (t.dataset.px) cur[0] = t.value + '%';
@@ -1015,10 +1059,11 @@ function renderPostEditor(id, e){
   };
   tb.querySelector('[data-embed]').onclick = ev => {
     ev.preventDefault(); comp.focus();
-    const url = prompt('Paste an Instagram or YouTube link:');
-    if (!url) return;
+    const raw = prompt('Paste an Instagram or YouTube link (or the "embed code" if that\'s what you copied):');
+    if (!raw) return;
+    const url = extractEmbedUrl(raw);
     const provider = /youtu\.?be/i.test(url) ? 'youtube' : (/instagram\.com/i.test(url) ? 'instagram' : 'link');
-    document.execCommand('insertHTML', false, embedHTML({provider, url: url.trim()}));
+    document.execCommand('insertHTML', false, embedHTML({provider, url}));
     save();
   };
 
