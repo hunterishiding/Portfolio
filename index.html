@@ -531,9 +531,9 @@ footer{background:var(--pine-deep); padding:18px 0;}
     </button>
     <nav class="links">
       <button data-view="home" data-label="nav-home" data-en="home" class="active">inicio</button>
-      <button data-view="gallery" data-label="nav-gallery" data-en="gallery">galería</button>
+      <button data-view="gallery" class="" data-label="nav-gallery" data-en="gallery">galería</button>
       <button data-view="about" data-label="nav-about" data-en="about">sobre mí</button>
-      <button data-view="notes" class="" data-label="nav-notes" data-en="field notes">bitácora</button>
+      <button data-view="notes" data-label="nav-notes" data-en="field notes">bitácora</button>
       <button data-view="contact" data-label="nav-contact" data-en="contact">contacto</button>
     </nav>
     <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
@@ -852,13 +852,14 @@ Tegucigalpa, Honduras (2026 - Presente )" data-i18n="custom.g0smd2">Tegucigalpa,
       <img class="contact-avatar" src="assets/avatar.png" alt="Pixel-art portrait of Hunter holding a camera">
 
       <div>
-        <h1>Excited to<br>hear from you!</h1>
+        <h1 data-en="Excited to
+hear from you!" data-i18n="custom.akiqg6">Me emociona escuchar tus ideas!</h1>
         <form id="contact-form">
           <label for="msg" class="visually-hidden" style="position:absolute;left:-9999px">Your message</label>
           <textarea id="msg" placeholder="Write your message here..." required=""></textarea>
-          <button type="submit" class="btn-wide">Send Message</button>
+          <button type="submit" class="btn-wide" data-en="Send Message" data-i18n="custom.j87p2s">Enviar mensaje</button>
         </form>
-        <p class="contact-note">Or email me directly at <a href="mailto:g.alessandroerazo@gmail.com">g.alessandroerazo@gmail.com</a>.</p>
+        <p class="contact-note" data-en="Or email me directly at g.alessandroerazo@gmail.com." data-i18n="custom.e52hqb">Or email me directly at <a href="mailto:g.alessandroerazo@gmail.com">g.alessandroerazo@gmail.com</a>.</p>
       </div>
     </div>
   </div>
