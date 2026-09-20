@@ -531,8 +531,8 @@ footer{background:var(--pine-deep); padding:18px 0;}
     </button>
     <nav class="links">
       <button data-view="home" data-label="nav-home" data-en="home" class="active">inicio</button>
-      <button data-view="gallery" class="" data-label="nav-gallery" data-en="gallery">galería</button>
-      <button data-view="about" data-label="nav-about" data-en="about">sobre mí</button>
+      <button data-view="gallery" data-label="nav-gallery" data-en="gallery">galería</button>
+      <button data-view="about" class="" data-label="nav-about" data-en="about">sobre mí</button>
       <button data-view="notes" data-label="nav-notes" data-en="field notes">bitácora</button>
       <button data-view="contact" data-label="nav-contact" data-en="contact">contacto</button>
     </nav>
@@ -753,27 +753,30 @@ It's our version of the Oscars">Ceremonia de Premiación de la carrera de Comuni
   <div class="about-bottom">
     <div class="wrap about-bottom-inner">
       <div>
-        <h2>Background</h2>
-        <p class="intro">A short intro to the list on the right — studies, training, or anything else worth listing.</p>
+        <h2 data-en="Background" data-i18n="custom.lv6j55">Trayectoria</h2>
+        <p class="intro" data-en="My path so far.
+From communications studies to hands-on photography training, all coming from Honduras." data-i18n="custom.45euou">Mi camino hasta ahora.<br>Desde estudios de comunicación hasta diplomados de fotografía, todo desde Honduras.</p>
       </div>
 
       <div class="cred-list">
         <!-- CREDENTIAL — copy this block to add a new entry to the list -->
         <div class="cred">
-          <h3>Qualification or course name</h3>
-          <p>Institution, city<br>One line of detail — focus, specialisation, or dates.</p>
+          <h3>Comunicación Estratégica y Audiovisual - UNITEC</h3>
+          <p data-en="(Strategic &amp; Audiovisual Communications - UNITEC)
+Tegucigalpa, Honduras ( 2026 - Present )" data-i18n="custom.zzc5mp">Tegucigalpa, Honduras ( 2026 - Presente )</p>
         </div>
         <!-- END CREDENTIAL -->
 
         <div class="cred">
-          <h3>Qualification or course name</h3>
-          <p>Institution, city<br>One line of detail — focus, specialisation, or dates.</p>
+          <h3><strong>Beca Alta Distinción&nbsp;-&nbsp;</strong>Fundación Nasser-UNITEC</h3>
+          <p data-en="(Academic Excellence Scholarship - Nasser Foundation-UNITEC)
+Tegucigalpa, Honduras (2026 - Presente )" data-i18n="custom.g0smd2">Tegucigalpa, Honduras (2026 - Presente )</p>
+        </div><div class="cred">
+          <h3 data-en="Professional Photography Diploma - Altius Academy" data-i18n="custom.gwdcm2">Diplomado de Fotografía Profesional - Altius Academy</h3>
+          <p>Tegucigalpa, Honduras ( 2024 )</p>
         </div>
 
-        <div class="cred">
-          <h3>Qualification or course name</h3>
-          <p>Institution, city<br>One line of detail — focus, specialisation, or dates.</p>
-        </div>
+        
       </div>
     </div>
   </div>
@@ -1065,7 +1068,7 @@ document.getElementById('contact-form').addEventListener('submit', e => {
 
 
 
-<div id="ed-resize" style="display: none; top: 754.592px; left: 898.75px;"></div>
+<div id="ed-resize" style="display: block; top: 773.125px; left: 1373.07px;"></div>
 <div id="ed-resize"></div>
 <div id="ed-resize"></div>
 <div id="ed-resize"></div><script src="assets/texture.js" defer=""></script>
