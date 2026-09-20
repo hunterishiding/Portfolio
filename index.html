@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-
+<html lang="es"><head>
 
 
 
@@ -324,8 +323,8 @@ section.view.active{display:block;}
   display:grid; grid-template-columns:.95fr 1.05fr; gap:48px; align-items:start;
 }
 .about-portrait{
-  width:100%; max-width:400px; aspect-ratio:4/5; object-fit:cover;
-  justify-self:end;
+  width:100%; max-width:480px; aspect-ratio:4/5; object-fit:cover;
+  justify-self:center;
   background:rgba(231,226,208,.07); border-radius:4px;
   display:flex; align-items:center; justify-content:center;
   border:1px dashed rgba(231,226,208,.35);
@@ -533,12 +532,12 @@ footer{background:var(--pine-deep); padding:18px 0;}
     </button>
     <nav class="links">
       <button data-view="home" data-label="nav-home" data-en="home" class="active">inicio</button>
-      <button data-view="gallery" data-label="nav-gallery" data-en="gallery">galería</button>
-      <button data-view="about" data-label="nav-about" data-en="about" class="">sobre mí</button>
+      <button data-view="gallery" class="" data-label="nav-gallery" data-en="gallery">galería</button>
+      <button data-view="about" data-label="nav-about" data-en="about">sobre mí</button>
       <button data-view="notes" data-label="nav-notes" data-en="field notes">bitácora</button>
       <button data-view="contact" data-label="nav-contact" data-en="contact">contacto</button>
     </nav>
-    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">EN</button>
+    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
   </div>
 </header>
 
@@ -727,7 +726,7 @@ It's our version of the Oscars">Ceremonia de Premiación de la carrera de Comuni
     <div class="about-top-inner">
       <!-- Swap this for a real portrait:
            <img class="about-portrait" src="assets/portrait.jpg" alt="Hunter"> -->
-      <img class="about-portrait" alt="" src="assets/image-2-.png" style="object-position:100% 100%">
+      <img class="about-portrait" alt="" src="assets/image-2-.png" style="object-position:100% 52%">
 
       <div>
       <div class="about-rows">
@@ -1041,5 +1040,4 @@ document.getElementById('contact-form').addEventListener('submit', e => {
 <div id="ed-resize"></div>
 <div id="ed-resize"></div><script src="assets/texture.js" defer=""></script>
 
-<div id="ed-resize"></div>
 <div id="ed-resize"></div></body></html>
