@@ -285,7 +285,7 @@ function renderCollection(e, lang){
   const desc     = (lang === 'en' && e.desc_en)     ? e.desc_en     : e.desc;
 
   const items = (e.media || []).map(m => `
-    <figure class="m-item ${orientClass(m.orient)}" data-anim="up">
+    <figure class="m-item ${orientClass(m.orient)}"${m.kind === 'embed' ? '' : ' data-anim="up"'}>
       ${mediaTag(m)}
       ${m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : ''}
     </figure>`).join('');
@@ -327,7 +327,7 @@ function renderPost(e, lang){
       </figure>`;
     }
     if (b.t === 'embed'){
-      return `<figure data-anim="up">${embedTag(b)}</figure>`;
+      return `<figure>${embedTag(b)}</figure>`;
     }
     // Rich-text blocks are stored as sanitised HTML produced by the editor.
     return b.html || '';
