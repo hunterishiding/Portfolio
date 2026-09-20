@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-
-
+<html lang="es"><head>
 
 
 
@@ -326,6 +324,7 @@ section.view.active{display:block;}
 }
 .about-portrait{
   width:100%; max-width:400px; aspect-ratio:4/5; object-fit:cover;
+  justify-self:end;
   background:rgba(231,226,208,.07); border-radius:4px;
   display:flex; align-items:center; justify-content:center;
   border:1px dashed rgba(231,226,208,.35);
@@ -482,7 +481,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
   .about-top-inner,
   .about-bottom-inner,
   .contact-inner{grid-template-columns:1fr; gap:36px;}
-  .about-portrait{max-width:380px;}
+  .about-portrait{max-width:380px; justify-self:start;}
   .blob-stack{max-width:260px;}
   .btn-light{max-width:none;}
 }
@@ -533,12 +532,12 @@ footer{background:var(--pine-deep); padding:18px 0;}
     </button>
     <nav class="links">
       <button data-view="home" data-label="nav-home" data-en="home" class="active">inicio</button>
-      <button data-view="gallery" data-label="nav-gallery" data-en="gallery">galería</button>
-      <button data-view="about" data-label="nav-about" data-en="about" class="">sobre mí</button>
+      <button data-view="gallery" class="" data-label="nav-gallery" data-en="gallery">galería</button>
+      <button data-view="about" data-label="nav-about" data-en="about">sobre mí</button>
       <button data-view="notes" data-label="nav-notes" data-en="field notes">bitácora</button>
       <button data-view="contact" data-label="nav-contact" data-en="contact">contacto</button>
     </nav>
-    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">EN</button>
+    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
   </div>
 </header>
 
@@ -727,7 +726,7 @@ It's our version of the Oscars">Ceremonia de Premiación de la carrera de Comuni
     <div class="about-top-inner">
       <!-- Swap this for a real portrait:
            <img class="about-portrait" src="assets/portrait.jpg" alt="Hunter"> -->
-      <img class="about-portrait" alt="" src="assets/image-2-.png" style="object-position:100% 100%">
+      <img class="about-portrait" alt="" src="assets/image-2-.png" style="object-position:100% 52%">
 
       <div>
       <div class="about-rows">
@@ -735,7 +734,7 @@ It's our version of the Oscars">Ceremonia de Premiación de la carrera de Comuni
         <div class="about-row">
           <span class="label">Bio</span>
           <div>
-            <p data-en="Hi, I'm Alessandro. I do photography and video work, and I'm extremely passionate about telling the stories that deserve to be told, especially the ones we don't normally hear in our environment. I care deeply about cultural, social, and environmental issues, and my dream is to one give life to these messages to reach thousands of people, and working with the UN and/or the European Union in their Communications and Audiovisual Production departments." data-i18n="custom.r5mlbx"><p dir="ltr"><span>&nbsp; &nbsp; &nbsp;¡Hola! Soy Alessandro. Me dedico a la fotografía y al video, y me </span><span>apasiona contar </span><span>esas historias que merecen ser contadas,</span><span>&nbsp;sobre todo aquellas </span><span>que </span><span>normalmente no </span><span>escuchamos en nuestro </span><span>entorno. Me apasiona abordar&nbsp;</span><span>los temas culturales, </span><span>sociales y eco</span><span>lógicos</span><span>, y </span><span>sueño con algún día </span><span>poder comunicar estos </span><span>mensajes para transmitirlos a miles de personas,&nbsp;</span><span>y trabajar</span><span>&nbsp;con la </span><span>ONU y/o la Unión Europea en sus departamentos de Comunicación y Producción Audiovisual.</span></p></p><p dir="ltr"><br></p><p></p><p dir="ltr"><br></p><p></p>
+            <p data-en="Hi, I'm Alessandro. I do photography and video work, and I'm extremely passionate about telling the stories that deserve to be told, especially the ones we don't normally hear in our environment. I care deeply about cultural, social, and environmental issues, and my dream is to one give life to these messages to reach thousands of people, and working with the UN and/or the European Union in their Communications and Audiovisual Production departments." data-i18n="custom.r5mlbx"><span>&nbsp; &nbsp; &nbsp;¡Hola! Soy Alessandro. Me dedico a la fotografía y al video, y me </span><span>apasiona contar </span><span>esas historias que merecen ser contadas,</span><span>&nbsp;sobre todo aquellas </span><span>que </span><span>normalmente no </span><span>escuchamos en nuestro </span><span>entorno. Me apasiona abordar&nbsp;</span><span>los temas culturales, </span><span>sociales y eco</span><span>lógicos</span><span>, y </span><span>sueño con algún día </span><span>poder comunicar estos </span><span>mensajes para transmitirlos a miles de personas,&nbsp;</span><span>y trabajar</span><span>&nbsp;con la </span><span>ONU y/o la Unión Europea en sus departamentos de Comunicación y Producción Audiovisual.</span></p>
             <p data-en="Photography has been one of my passions for as long as I can remember. I started out just admiring photos and capturing every-day moments with an old point-and-shoot. Then, in 2023 I got my first real camera, a Nikon D5100 that I still use today. Cinematography always caught my eye, but it wasn't until a week into my internship, when I was assigned my first video project, capturing the CAM anniversary, that I finally got the chance to dive fully into video. I was thrown into the deep end, and it's been one of my biggest passions ever since." data-i18n="custom.2usws9"><span>&nbsp; &nbsp; &nbsp;La </span><span>fotografía ha sido </span><span>una de mis pasiones </span><span>desde siempre. Empecé </span><span>solo admirando fotos </span><span>y capturando momentos&nbsp;</span><span>con una point and </span><span>shoot vieja, hasta </span><span>que en 2023 conseguí </span><span>mi primera cámara </span><span>real, una Nikon D5100 </span><span>que todavía utilizo. </span><span>El cine siempre me ha </span><span>llamado la atención, </span><span>pero no fue hasta una </span><span>semana después de </span><span>empezar mi pasantía, </span><span>cuando me asignaron </span><span>mi primer proyecto </span><span>audiovisual, capturar lo que ocurría en el </span><span>aniversario del CAM,&nbsp;</span><span>que finalmente tuve </span><span>la oportunidad de </span><span>meterme de lleno al </span><span>video. Me lanzaron a </span><span>la parte más </span><span>profunda, y desde </span><span>entonces ha sido una </span><span>de mis pasiones más </span><span>grandes.&nbsp;</span></p>
           </div>
         </div>
@@ -1041,6 +1040,4 @@ document.getElementById('contact-form').addEventListener('submit', e => {
 <div id="ed-resize"></div>
 <div id="ed-resize"></div><script src="assets/texture.js" defer=""></script>
 
-<div id="ed-resize"></div>
-<div id="ed-resize"></div>
 <div id="ed-resize"></div></body></html>
