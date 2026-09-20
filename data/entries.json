@@ -6,7 +6,7 @@
   "entries": {
     "gal-1": {
       "type": "gallery",
-      "title": "Basketball Copa Jaguar",
+      "title": "Basketball Copa Jaguar obsolete",
       "year": "2026",
       "desc": "An idea that turned into reality exactly how I imagined it.",
       "cover": "assets/basketball.jpg",
@@ -38,7 +38,7 @@
     },
     "gal-4": {
       "type": "gallery",
-      "title": "El Salvador",
+      "title": "El Salvador obsolete",
       "year": "2026",
       "desc": "Current challenge: Capture what's most relevant on this family trip",
       "cover": "assets/dsc-2069.jpg",
