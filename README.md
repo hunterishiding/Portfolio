@@ -5,7 +5,8 @@ Static portfolio site. No build step, no framework, no dependencies.
 ```
 index.html            the main site — home, gallery, about, field notes, contact
 entry.html            renders every collection page and every blog post
-data/entries.json     the content for those pages, plus the menu/footer labels
+data/entries.json     the content for those pages, plus where the menu/footer links go
+data/translations.json  every Spanish / English text pair (see "Text and translation")
 editADMINhtr.html     the visual editor (see "The editor" below)
 assets/               photos, video, wordmark, icons
 assets/texture.js     the cherry-blossom background (see "The background texture")
@@ -93,6 +94,34 @@ live site — see "Keeping the editor private" below.
 - Visitors switch EN/ES with the button in the top bar. Their choice is
   remembered.
 
+**Where translations are stored.** Every Spanish/English pair for `index.html`
+and the menu/footer lives in its own file, `data/translations.json`, so it can
+never be lost by overwriting `index.html`:
+
+```json
+"home.welcome-title": { "es": "Bienvenido a mi mundo", "en": "Welcome to my world" }
+```
+
+- Each piece of text has one key. `es` is the Spanish (default) text, `en` the
+  English. An empty `"en"` means that text stays Spanish for English visitors
+  (the Enfocus blurb is like that today, so it is easy to spot and fill in).
+- On every visit the site loads this file and it **wins over** whatever text is
+  written in `index.html`. Editing the file by hand on GitHub works: change
+  the words, keep the quotes and commas, use `<br>` for a line break.
+- The editor reads it when it opens and rewrites it on every **Save**, so you
+  can keep using the editor exactly as before. New translated text gets its own
+  key automatically.
+- Nothing is ever removed from the file automatically, so it doubles as a backup.
+- If the file is missing or has a typo in it, the site just shows the text
+  written in `index.html`, and the editor leaves the file alone until it is fixed.
+- If `index.html` is ever replaced by an older copy, the translations are still
+  safe here. Text that still matches is re-attached automatically; anything
+  that was reworded needs a look. Copy the current `index.html` back in and
+  everything reconnects.
+- Collection and post pages keep their own English titles and descriptions
+  inside `data/entries.json`. The menu and footer wording on those pages is
+  read from `data/translations.json`.
+
 ### Buttons, menu and footer
 
 Click any button or link in the preview — the top menu, the footer, the big
@@ -105,9 +134,9 @@ home buttons, "Send Message" — and the **Button / link** panel opens:
   link also updates the Instagram URL under "Site links").
 
 Clicking still switches pages in the preview, so you can browse while you edit.
-Changes to the top menu and footer are also saved into `data/entries.json` so
-that every collection and post page shows the same menu. **Save both files**
-(the editor does this when you save).
+Changes to the top menu and footer are saved into `data/translations.json`
+(wording) and `data/entries.json` (where links go) so that every collection and
+post page shows the same menu. The editor saves all the files when you save.
 
 ### Photos
 
@@ -230,8 +259,8 @@ messages in your inbox instead, see the commented instructions at the bottom of
 - **Changes don't show on the live site** — Vercel takes a minute after a push.
   Hard-refresh with Ctrl+Shift+R.
 - **A menu label is right on the home page but old on a collection page** —
-  the collection pages read their menu from `data/entries.json`, so that file
-  needs to be saved/committed too.
+  the collection pages read their menu from `data/translations.json` and
+  `data/entries.json`, so those files need to be saved/committed too.
 - **A custom page address gives a 404** — check that `vercel.json` is in the
   repo, and that you're on the deployed site rather than a local server.
 - **An Instagram embed is blank** — see the embed notes above; it's almost

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="es"><head>
 
 
 
@@ -529,13 +529,13 @@ footer{background:var(--pine-deep); padding:18px 0;}
       <img class="mark" src="assets/hunter-wordmark.png" alt="Hunter">
     </button>
     <nav class="links">
-      <button data-view="home" class="active" data-label="nav-home">home</button>
-      <button data-view="gallery" class="" data-label="nav-gallery">gallery</button>
-      <button data-view="about" class="" data-label="nav-about">about</button>
-      <button data-view="notes" class="" data-label="nav-notes">field notes</button>
-      <button data-view="contact" data-label="nav-contact">contact</button>
+      <button data-view="home" class="active" data-label="nav-home" data-en="home">inicio</button>
+      <button data-view="gallery" class="" data-label="nav-gallery" data-en="gallery">galería</button>
+      <button data-view="about" class="" data-label="nav-about" data-en="about">sobre mí</button>
+      <button data-view="notes" class="" data-label="nav-notes" data-en="field notes">bitácora</button>
+      <button data-view="contact" data-label="nav-contact" data-en="contact">contacto</button>
     </nav>
-    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">EN</button>
+    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
   </div>
 </header>
 
@@ -550,9 +550,9 @@ footer{background:var(--pine-deep); padding:18px 0;}
     <div class="hero-inner">
       <img class="hero-avatar" src="assets/avatar.png" alt="Pixel-art portrait of Hunter holding a camera">
       <div class="hero-copy">
-        <p class="greeting">Hey, I'm</p>
+        <p data-i18n="home.greeting" class="greeting" data-en="Hey, I'm">Hey, I'm</p>
         <img class="wordmark" src="assets/hunter-wordmark.png" alt="Hunter">
-        <p class="role">photographer, videographer, creative</p>
+        <p data-i18n="home.role" class="role" data-en="photographer, videographer, comunicator and creative">fotografo, videografo, comunicólogo y creativo</p>
       </div>
     </div>
   </div>
@@ -561,8 +561,8 @@ footer{background:var(--pine-deep); padding:18px 0;}
   <div class="welcome">
     <div class="wrap">
       <div class="welcome-head">
-        <h2>Welcome to my world</h2>
-        <p>click on anything and enjoy</p>
+        <h2 data-i18n="home.welcome-title" data-en="Welcome to my world">Bienvenido a mi mundo</h2>
+        <p data-i18n="home.welcome-sub" data-en="click on anything and enjoy">haz click y disfruta</p>
       </div>
 
       <div class="bento">
@@ -572,13 +572,13 @@ footer{background:var(--pine-deep); padding:18px 0;}
           <figure class="tile lg shown" data-entry="gal-3" style="margin:0" data-anim="zoom">
             <a class="tile-link" href="entry.html?id=gal-3" aria-label="Open collection"></a>
             <img src="assets/xv-del-cam.jpg" alt="XV del CAM — crowd on a walkway above a piñata">
-            <figcaption>XV aniversario del CAM</figcaption>
+            <figcaption data-i18n="home.caption-cam" data-en="CAM's XV aniversary">XV aniversario del CAM</figcaption>
           </figure>
 
           <div class="bento-left-row">
             <!-- TILE — small. COPY one of these two <figure> blocks to add another. -->
-            <figure class="tile sm shown" data-entry="tile-ai" style="margin:0" data-anim="zoom">
-              <a class="tile-link" href="entry.html?id=tile-ai" aria-label="Open collection"></a>
+            <figure class="tile sm shown" data-entry="gal-6" style="margin:0" data-anim="zoom">
+              <a class="tile-link" href="entry.html?id=gal-6" aria-label="Open collection"></a>
             <img src="assets/ai-vs-machine.jpg" alt="Boxer resting in the corner of a ring during a shoot">
               <figcaption>AI vs Machine</figcaption>
             </figure>
@@ -594,8 +594,8 @@ footer{background:var(--pine-deep); padding:18px 0;}
         <!-- TILE — the tall right-hand one -->
         <figure class="tile lg tall shown" data-entry="tile-bb" style="margin:0" data-anim="zoom">
           <a class="tile-link" href="entry.html?id=tile-bb" aria-label="Open collection"></a>
-            <img src="assets/basketball.jpg" alt="Basketball player driving to the basket mid-air">
-          <figcaption>Basketball</figcaption>
+            <img src="assets/basketball.jpg" alt="Basketball player driving to the basket mid-air" style="object-position:0% 0%">
+          <figcaption data-i18n="home.caption-basketball" data-en="Copa Jaguar 3v3 Basket">Copa Jaguar 3v3 Basket</figcaption>
         </figure>
       </div>
 
@@ -617,8 +617,8 @@ footer{background:var(--pine-deep); padding:18px 0;}
       </div>
 
       <div class="band-copy">
-        <h2>From shooting to editing,<br>and everything in between.</h2>
-        <p>Most of what I create starts as an excuse to grab a camera, then it turns into something I want to keep telling people about.</p>
+        <h2 data-i18n="home.band-title" data-en="From shooting to editing,&lt;br&gt;and everything in between.">Desde el rodaje a la edición,<br>y todo lo que hay en medio&nbsp;</h2>
+        <p data-i18n="home.band-text" data-en="Most of what I create starts as an excuse to grab a camera, then it turns into something I want to keep telling people about.">La mayoría de lo que hago surge como una excusa para tomar la cámara, y luego se transforma en algo de lo que no puedo parar de hablar.</p>
         <button class="btn-light" data-view="about">Read more about me</button>
       </div>
     </div>
@@ -627,8 +627,8 @@ footer{background:var(--pine-deep); padding:18px 0;}
   <!-- Closing call to action -->
   <div class="sayhi">
     <div class="wrap">
-      <h2>Come say hi.</h2>
-      <p>Open to freelance work, collaborations, and anyone who wants to talk about cameras, ecosystems and a bunch of other stuff.</p>
+      <h2 data-i18n="home.sayhi-title" data-en="Come say hi.">Ven a saludar</h2>
+      <p data-i18n="home.sayhi-text" data-en="Open to freelance work, collaborations, and anyone who wants to talk about cameras, ecosystems and a bunch of other stuff.">Abierto a trabajo freelance, colaboraciones y a cualquiera que quiera hablar sobre cámaras, ecosistemas y muchos otros temas.</p>
       <button class="btn-dark" data-view="contact">Get in Touch</button>
     </div>
   </div>
@@ -643,19 +643,27 @@ footer{background:var(--pine-deep); padding:18px 0;}
 <section class="view" id="gallery">
   <div class="gallery-page">
     <div class="wrap">
-      <h1>This is my work.</h1>
+      <h1 data-i18n="gallery.title" data-en="This is my work.">Esto es lo que hago.</h1>
 
       <div class="gallery-grid">
 
         <!-- GALLERY ITEM — copy this whole <article> block to add a new one.
              Replace the <div class="placeholder-img"> with:
              <img src="assets/your-photo.jpg" alt="Describe the photo"> -->
-        <article class="g-item" data-entry="gal-1">
+        <article class="g-item" data-entry="gal-qcx1zz">
+          <span class="year">2026</span>
+          <h3>ENFOCUS 2026</h3>
+          <img alt="" src="assets/screenshot-2026-09-19-195539.png" style="aspect-ratio:16 / 9; object-position:100% 100%">
+          <p data-i18n="gallery.gal-qcx1zz.desc">Ceremonia de Premiación de la carrera de Comunicación Estratégica y Audiovisual de UNITEC.</p>
+          <a data-i18n="gallery.gal-qcx1zz.link" class="btn-outline g-open" href="entry.html?id=gal-qcx1zz" data-en="View collection">Ver galería</a>
+        </article>
+
+        <article class="g-item" data-entry="tile-bb">
           <span class="year">2026</span>
           <h3>Basketball Copa Jaguar</h3>
           <img alt="" src="assets/basketball.jpg" style="aspect-ratio:16 / 9; object-position:100% 43%">
-          <p>An idea that turned into reality exactly how I imagined it.</p>
-          <a class="btn-outline g-open" href="entry.html?id=gal-1">View collection</a>
+          <p data-i18n="gallery.tile-bb.desc" data-en="An idea that turned into reality exactly how I imagined it.">Una idea que se volvió realidad exactamente como la imaginaba.</p>
+          <a data-i18n="gallery.tile-bb.link" class="btn-outline g-open" href="entry.html?id=tile-bb" data-en="View collection">Ver galería</a>
         </article>
         <!-- END GALLERY ITEM -->
 
@@ -663,38 +671,38 @@ footer{background:var(--pine-deep); padding:18px 0;}
           <span class="year">2026</span>
           <h3>X Aniversario de Gastronomía</h3>
           <img alt="" src="assets/screenshot-2026-09-15-153907.png" style="object-position:50% 50%; aspect-ratio:16 / 9">
-          <p>Chefs and Cooks celebrate their anniversary... What does "PDI" mean to you?</p>
-          <a class="btn-outline g-open" href="entry.html?id=gal-2">View collection</a>
+          <p data-i18n="gallery.gal-2.desc" data-en="Chefs and Cooks celebrate their anniversary... What does &quot;PDI&quot; mean to you?">Chefs y cocineros celebran su aniversario...<br>¿Qué significa para ti "PDI"?</p>
+          <a data-i18n="gallery.gal-2.link" class="btn-outline g-open" href="entry.html?id=gal-2" data-en="View collection">Ver galería</a>
         </article>
 
         <article class="g-item" data-entry="gal-3">
           <span class="year">2026</span>
           <h3>XV Aniversario del CAM</h3>
           <img alt="" src="assets/xv-del-cam.jpg" style="aspect-ratio:16 / 9; object-position:50% 50%">
-          <p>Celebrating the place that has given me the tools for most of my video work!!!</p>
-          <a class="btn-outline g-open" href="entry.html?id=gal-3">View collection</a>
+          <p data-i18n="gallery.gal-3.desc" data-en="Celebrating the place that has given me the tools for most of my video work!!!">Celebrando el lugar que me ha dado las herramientas para la mayoría de mi trabajo!!!</p>
+          <a data-i18n="gallery.gal-3.link" class="btn-outline g-open" href="entry.html?id=gal-3" data-en="View collection">Ver galería</a>
         </article>
 
-        <article class="g-item" data-entry="gal-4">
+        <article class="g-item" data-entry="tile-sv">
           <span class="year">2026</span>
           <h3>El Salvador</h3>
           <img alt="" src="assets/dsc-2069.jpg" style="object-position:100% 0%; aspect-ratio:16 / 9">
-          <p>Current challenge: Capture what's most relevant on this family trip</p>
-          <a class="btn-outline g-open" href="entry.html?id=gal-4">View collection</a>
+          <p data-i18n="gallery.tile-sv.desc" data-en="Current challenge: Capture the most beautiful things we see on this family trip">¿El reto? Capturar lo más bonito que veamos en este viaje familiar</p>
+          <a data-i18n="gallery.tile-sv.link" class="btn-outline g-open" href="entry.html?id=tile-sv" data-en="View collection">Ver galería</a>
         </article>
 
         <article class="g-item" data-entry="gal-5">
           <span class="year">2026</span>
           <h3>El Picacho</h3>
           <img alt="" src="assets/dsc-1624.jpg" style="aspect-ratio:16 / 9; object-position:50% 50%">
-          <p>Highlights from a Youth Group Activity</p>
-          <a class="btn-outline g-open" href="entry.html?id=gal-5">View collection</a>
+          <p data-i18n="gallery.gal-5.desc" data-en="Highlights from a Youth Group Activity">Highlights de un viaje de Pastoral Juvenil</p>
+          <a data-i18n="gallery.gal-5.link" class="btn-outline g-open" href="entry.html?id=gal-5" data-en="View collection">Ver galería</a>
         </article><article class="g-item" data-entry="gal-6">
           <span class="year">2025</span>
           <h3>AI vs Machine</h3>
           <img alt="" src="assets/dsc02404.jpg" style="aspect-ratio:16 / 9; object-position:50% 50%">
-          <p>When you're on-set at a short film... Why not become BTS photographer?</p>
-          <a class="btn-outline g-open" href="entry.html?id=gal-6">View collection</a>
+          <p data-i18n="gallery.gal-6.desc" data-en="When you're on-set at a short film... Why not become BTS photographer?">Cuando estás en el set de un cortometraje... ¿Porqué no convertirse en el fotógrafo del detrás de cámaras?</p>
+          <a data-i18n="gallery.gal-6.link" class="btn-outline g-open" href="entry.html?id=gal-6" data-en="View collection">Ver galería</a>
         </article>
 
         
@@ -874,7 +882,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
       <img class="mark" src="assets/hunter-wordmark.png" alt="Hunter">
     </button>
     <div class="footer-links">
-      <button data-view="contact" data-label="foot-contact">Contact</button>
+      <button data-view="contact" data-label="foot-contact" data-en="Contact">Contacto</button>
       <a href="https://instagram.com/hunterwashiding" target="_blank" rel="noopener" data-label="foot-instagram">Instagram</a>
     </div>
   </div>
@@ -889,6 +897,14 @@ footer{background:var(--pine-deep); padding:18px 0;}
    click it again (or tab into it) to select it as a whole and fill in
    "English version" in the side panel. Anything left untranslated just
    keeps showing what you wrote, in both languages.
+
+   WHERE THE TRANSLATIONS ARE KEPT
+   Every Spanish/English pair is also stored on its own in
+   data/translations.json (one key per element, set with data-i18n, or with
+   data-label for the menu/footer). On every visit that file is loaded and
+   overrides the text written in this page, so the translations survive even
+   if this file is ever overwritten. The editor rewrites it on every Save.
+   If the file is missing or broken the page simply uses what is written here.
    =========================================================================== */
 (function(){
   const KEY = 'siteLang';
@@ -909,6 +925,45 @@ footer{background:var(--pine-deep); padding:18px 0;}
   if (!lang) lang = (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'es';
   apply(lang);
   btn?.addEventListener('click', () => apply(window.__siteLang === 'en' ? 'es' : 'en'));
+
+  // Load data/translations.json and let it win over the text written above.
+  window.__i18nReady = fetch('data/translations.json', {cache:'no-cache'})
+    .then(r => r.ok ? r.json() : null)
+    .then(J => {
+      const S = J && J.strings;
+      if (!S) return;
+
+      // Recovery: if this page was overwritten by an older copy, the keys are gone but the
+      // wording usually isn't. Re-attach untagged text to its entry by matching the wording
+      // (best effort; the editor saves the keys back into the page on the next Save).
+      const norm = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent.replace(/\s+/g, ' ').trim(); };
+      const byText = new Map();
+      Object.entries(S).forEach(([k, t]) => [t.es, t.en].forEach(v => {
+        const n = v ? norm(v) : '';
+        if (n.length < 3) return;
+        if (!byText.has(n)) byText.set(n, []);
+        if (!byText.get(n).includes(k)) byText.get(n).push(k);
+      }));
+      const claimed = new Set([...document.querySelectorAll('[data-i18n],[data-label]')]
+        .map(e => e.dataset.i18n || e.dataset.label));
+      document.querySelectorAll('h1,h2,h3,h4,p,figcaption,a,button,span,li').forEach(el => {
+        if (el.dataset.i18n || el.dataset.label) return;
+        if (![...el.children].every(c => c.tagName === 'BR')) return;
+        const key = (byText.get(norm(el.innerHTML)) || []).find(k => !claimed.has(k));
+        if (key) { claimed.add(key); el.dataset.i18n = key; }
+      });
+
+      document.querySelectorAll('[data-i18n],[data-label]').forEach(el => {
+        const t = S[el.dataset.i18n || el.dataset.label];
+        if (!t) return;
+        if (typeof t.es === 'string' && t.es) el.dataset.esOrig = t.es;
+        if (typeof t.en === 'string' && t.en) el.dataset.en = t.en; else delete el.dataset.en;
+        // Elements with no English version aren't touched by apply(), so set their text here.
+        if (el.dataset.en === undefined && el.dataset.esOrig !== undefined) el.innerHTML = el.dataset.esOrig;
+      });
+      apply(window.__siteLang);
+    })
+    .catch(() => {});   // no file / bad JSON: keep the text already on the page
 })();
 </script>
 

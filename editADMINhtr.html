@@ -13,6 +13,7 @@
   WHAT IT EDITS
     index.html              the main site
     data/entries.json       every collection and blog post
+    data/translations.json  every Spanish / English text pair on the site
     assets/                 photos and videos
 
   WHERE IT SAVES  (pick one in the Save panel)
@@ -203,6 +204,7 @@ const statusEl = document.getElementById('status');
 const dot    = document.getElementById('dot');
 
 let db        = null;    // parsed data/entries.json
+let tr        = null;    // parsed data/translations.json (null = could not be read, so it is never overwritten)
 let dirHandle = null;    // local folder handle
 const GH_KEY  = 'ghConfig';
 function loadGh(){ try{ const s = JSON.parse(localStorage.getItem(GH_KEY) || 'null'); return (s && s.token) ? s : null; }catch(e){ return null; } }
@@ -293,9 +295,53 @@ async function boot(){
     setStatus('Could not read data/entries.json. Serve this folder over http — run "python3 -m http.server 8000".', 'warn');
     return;
   }
+  await loadTranslations();
   await loadSite();
   renderLayers();
   showHome();
+}
+
+/* data/translations.json — every Spanish/English pair, kept apart from index.html
+   so an overwritten page can never lose them. A missing file is fine (it gets
+   created on the first Save); an unreadable one is left alone. */
+async function loadTranslations(){
+  try{
+    const r = await fetch('data/translations.json', {cache:'no-store'});
+    tr = r.ok ? await r.json() : {strings:{}};
+  }catch{
+    tr = null;
+    setStatus('data/translations.json could not be read (bad JSON?). Saving will leave it untouched until it is fixed.', 'warn');
+  }
+  if (tr) tr.strings = tr.strings || {};
+}
+
+/* Read every translated text out of the live page and fold it into tr.
+   Existing keys the page no longer uses are kept on purpose: harmless, and a backup. */
+function collectTranslations(){
+  const doc = frame.contentDocument;
+  if (!tr || !doc || !doc.getElementById('home')) return null;   // only when index.html is what's loaded
+
+  // Give new translated elements a key, and make sure a duplicated block gets its own.
+  const seen = new Set();
+  doc.querySelectorAll('[data-i18n],[data-en]:not([data-label])').forEach(el => {
+    let k = el.dataset.i18n;
+    if (!k || seen.has(k)){
+      do { k = 'custom.' + Math.random().toString(36).slice(2, 8); } while (seen.has(k) || tr.strings[k]);
+      el.dataset.i18n = k;
+    }
+    seen.add(k);
+  });
+
+  doc.querySelectorAll('[data-i18n],[data-label]').forEach(el => {
+    const key = el.dataset.i18n || el.dataset.label;
+    // menu/footer items only count once they have (or already had) a translation
+    if (!el.dataset.i18n && el.dataset.en === undefined && !tr.strings[key]) return;
+    tr.strings[key] = {
+      es: el.dataset.esOrig !== undefined ? el.dataset.esOrig : el.innerHTML,
+      en: el.dataset.en || ''
+    };
+  });
+  return JSON.stringify(tr, null, 2) + '\n';
 }
 
 async function loadSite(){
@@ -308,10 +354,11 @@ async function loadSite(){
   const base = new URL('.', location.href).href;
   html = html.replace('<head>', `<head>\n<base id="ed-base" href="${base}">`);
   await new Promise(res => { frame.onload = res; frame.srcdoc = html; });
+  try { await frame.contentWindow.__i18nReady; } catch {}   // page has pulled in data/translations.json
   setupEditing(frame.contentDocument);
   dirty = false; dot.classList.remove('dirty');
   document.getElementById('bar-text').textContent = 'index.html';
-  setStatus('Ready. Click any text or photo to change it.', 'ok');
+  if (tr) setStatus('Ready. Click any text or photo to change it.', 'ok');
 }
 
 
@@ -1409,6 +1456,7 @@ const fileB64 = file => new Promise(res => {
 document.getElementById('btn-save').onclick = async () => {
   const saveBtn = document.getElementById('btn-save');
   if (saveBtn.disabled) return; // already committing — ignore a double-click/tap
+  const trJson = collectTranslations();   // before buildHtml so new keys land in the saved page
   const html = buildHtml();
   const json = JSON.stringify(db, null, 2);
 
@@ -1418,6 +1466,7 @@ document.getElementById('btn-save').onclick = async () => {
     try{
       await ghPut('index.html', b64(html), 'Update site');
       await ghPut('data/entries.json', b64(json), 'Update entries');
+      if (trJson) await ghPut('data/translations.json', b64(trJson), 'Update translations');
       for (const {name, file} of pending)
         await ghPut('assets/' + name, await fileB64(file), 'Add ' + name);
       pending = [];
@@ -1441,6 +1490,10 @@ document.getElementById('btn-save').onclick = async () => {
       const d = await dirHandle.getDirectoryHandle('data', {create:true});
       const fh = await d.getFileHandle('entries.json', {create:true});
       const w = await fh.createWritable(); await w.write(json); await w.close();
+      if (trJson){
+        const th = await d.getFileHandle('translations.json', {create:true});
+        const tw = await th.createWritable(); await tw.write(trJson); await tw.close();
+      }
       clean('Saved to the folder.');
     }catch(err){ setStatus('Save failed: ' + err.message, 'warn'); }
     return;
@@ -1448,10 +1501,11 @@ document.getElementById('btn-save').onclick = async () => {
 
   download(new Blob([html], {type:'text/html'}), 'index.html');
   download(new Blob([json], {type:'application/json'}), 'entries.json');
+  if (trJson) setTimeout(() => download(new Blob([trJson], {type:'application/json'}), 'translations.json'), 250);
   pending.forEach(({name, file}, i) => setTimeout(() => download(file, name), (i + 1) * 350));
   const n = pending.length; pending = [];
-  clean(`Downloaded index.html, entries.json${n ? ` and ${n} media file(s)` : ''}. ` +
-        `index.html goes in the root, entries.json in data/, media in assets/.`);
+  clean(`Downloaded index.html, entries.json${trJson ? ', translations.json' : ''}${n ? ` and ${n} media file(s)` : ''}. ` +
+        `index.html goes in the root, entries.json and translations.json in data/, media in assets/.`);
 };
 
 async function writeFile(name, text){

@@ -1,0 +1,129 @@
+{
+  "_readme": "All Spanish/English text for index.html and the shared menu/footer. Each key is one piece of text: \"es\" is the Spanish (default) version, \"en\" the English one. An empty \"en\" means that text stays in Spanish for English visitors. The site loads this file on every visit and it overrides whatever text is in index.html, so translations survive even if index.html is overwritten. The editor rewrites this file on every Save. You can also edit it by hand: keep the quotes and commas intact, and use <br> for line breaks.",
+  "strings": {
+    "nav-home": {
+      "es": "inicio",
+      "en": "home"
+    },
+    "nav-gallery": {
+      "es": "galería",
+      "en": "gallery"
+    },
+    "nav-about": {
+      "es": "sobre mí",
+      "en": "about"
+    },
+    "nav-notes": {
+      "es": "bitácora",
+      "en": "field notes"
+    },
+    "nav-contact": {
+      "es": "contacto",
+      "en": "contact"
+    },
+    "home.greeting": {
+      "es": "Hey, I'm",
+      "en": "Hey, I'm"
+    },
+    "home.role": {
+      "es": "fotografo, videografo, comunicólogo y creativo",
+      "en": "photographer, videographer, comunicator and creative"
+    },
+    "home.welcome-title": {
+      "es": "Bienvenido a mi mundo",
+      "en": "Welcome to my world"
+    },
+    "home.welcome-sub": {
+      "es": "haz click y disfruta",
+      "en": "click on anything and enjoy"
+    },
+    "home.caption-cam": {
+      "es": "XV aniversario del CAM",
+      "en": "CAM's XV aniversary"
+    },
+    "home.caption-basketball": {
+      "es": "Copa Jaguar 3v3 Basket",
+      "en": "Copa Jaguar 3v3 Basket"
+    },
+    "home.band-title": {
+      "es": "Desde el rodaje a la edición,<br>y todo lo que hay en medio&nbsp;",
+      "en": "From shooting to editing,<br>and everything in between."
+    },
+    "home.band-text": {
+      "es": "La mayoría de lo que hago surge como una excusa para tomar la cámara, y luego se transforma en algo de lo que no puedo parar de hablar.",
+      "en": "Most of what I create starts as an excuse to grab a camera, then it turns into something I want to keep telling people about."
+    },
+    "home.sayhi-title": {
+      "es": "Ven a saludar",
+      "en": "Come say hi."
+    },
+    "home.sayhi-text": {
+      "es": "Abierto a trabajo freelance, colaboraciones y a cualquiera que quiera hablar sobre cámaras, ecosistemas y muchos otros temas.",
+      "en": "Open to freelance work, collaborations, and anyone who wants to talk about cameras, ecosystems and a bunch of other stuff."
+    },
+    "gallery.title": {
+      "es": "Esto es lo que hago.",
+      "en": "This is my work."
+    },
+    "gallery.gal-qcx1zz.desc": {
+      "es": "Ceremonia de Premiación de la carrera de Comunicación Estratégica y Audiovisual de UNITEC.",
+      "en": ""
+    },
+    "gallery.gal-qcx1zz.link": {
+      "es": "Ver galería",
+      "en": "View collection"
+    },
+    "gallery.tile-bb.desc": {
+      "es": "Una idea que se volvió realidad exactamente como la imaginaba.",
+      "en": "An idea that turned into reality exactly how I imagined it."
+    },
+    "gallery.tile-bb.link": {
+      "es": "Ver galería",
+      "en": "View collection"
+    },
+    "gallery.gal-2.desc": {
+      "es": "Chefs y cocineros celebran su aniversario...<br>¿Qué significa para ti \"PDI\"?",
+      "en": "Chefs and Cooks celebrate their anniversary... What does \"PDI\" mean to you?"
+    },
+    "gallery.gal-2.link": {
+      "es": "Ver galería",
+      "en": "View collection"
+    },
+    "gallery.gal-3.desc": {
+      "es": "Celebrando el lugar que me ha dado las herramientas para la mayoría de mi trabajo!!!",
+      "en": "Celebrating the place that has given me the tools for most of my video work!!!"
+    },
+    "gallery.gal-3.link": {
+      "es": "Ver galería",
+      "en": "View collection"
+    },
+    "gallery.tile-sv.desc": {
+      "es": "¿El reto? Capturar lo más bonito que veamos en este viaje familiar",
+      "en": "Current challenge: Capture the most beautiful things we see on this family trip"
+    },
+    "gallery.tile-sv.link": {
+      "es": "Ver galería",
+      "en": "View collection"
+    },
+    "gallery.gal-5.desc": {
+      "es": "Highlights de un viaje de Pastoral Juvenil",
+      "en": "Highlights from a Youth Group Activity"
+    },
+    "gallery.gal-5.link": {
+      "es": "Ver galería",
+      "en": "View collection"
+    },
+    "gallery.gal-6.desc": {
+      "es": "Cuando estás en el set de un cortometraje... ¿Porqué no convertirse en el fotógrafo del detrás de cámaras?",
+      "en": "When you're on-set at a short film... Why not become BTS photographer?"
+    },
+    "gallery.gal-6.link": {
+      "es": "Ver galería",
+      "en": "View collection"
+    },
+    "foot-contact": {
+      "es": "Contacto",
+      "en": "Contact"
+    }
+  }
+}

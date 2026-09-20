@@ -458,13 +458,18 @@ function layoutAndReveal(){
   }
 }
 
-/* ----- Menu + footer labels, edited in the editor and stored in data/entries.json ----- */
+/* ----- Menu + footer labels -----
+   The wording (Spanish + English) comes from data/translations.json, the single
+   place all translations live. data/entries.json still supplies where each link
+   goes, and is the fallback for wording if translations.json can't be read. */
 function applyLabels(){
   const L = (db.site && db.site.labels) || {};
+  const S = (T && T.strings) || {};
   document.querySelectorAll('[data-label]').forEach(el => {
-    const l = L[el.dataset.label];
-    if (!l) return;
-    const txt = (lang === 'en' && l.en) ? l.en : l.es;
+    const l = L[el.dataset.label] || {};
+    const t = S[el.dataset.label] || {};
+    const es = t.es || l.es, en = t.en || l.en;
+    const txt = (lang === 'en' && en) ? en : es;
     if (txt) el.textContent = txt;
     if (l.to){
       el.setAttribute('href', /^(https?:|mailto:)/i.test(l.to) ? l.to : 'index.html#' + l.to);
@@ -484,6 +489,7 @@ function applyStaticTranslations(lang){
    LANGUAGE + BOOT
    =========================================================================== */
 let db = null;
+let T = null;   // data/translations.json
 function currentLang(){
   try {
     const stored = localStorage.getItem('siteLang');
@@ -513,9 +519,11 @@ langBtn?.addEventListener('click', () => {
   renderAll();
 });
 
-fetch('data/entries.json', {cache:'no-store'})
-  .then(r => r.ok ? r.json() : Promise.reject(r.status))
-  .then(d => { db = d; id = resolveId(d); prettyUrl(); renderAll(); })
+Promise.all([
+  fetch('data/entries.json', {cache:'no-store'}).then(r => r.ok ? r.json() : Promise.reject(r.status)),
+  fetch('data/translations.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : null).catch(() => null)
+])
+  .then(([d, t]) => { db = d; T = t; id = resolveId(d); prettyUrl(); renderAll(); })
   .catch(() => notFound('Could not load data/entries.json.'));
 </script>
 <script src="assets/texture.js" defer></script>
