@@ -133,10 +133,28 @@ home buttons, "Send Message" — and the **Button / link** panel opens:
 - **Link address** — for links that go to another site (the footer Instagram
   link also updates the Instagram URL under "Site links").
 
-Clicking still switches pages in the preview, so you can browse while you edit.
+Clicking a button inside the page selects it and puts the cursor straight in the
+**Text** box: just type and the button changes as you go (it does not jump to
+another page). The top menu and footer still switch pages in the preview, so you
+can browse while you edit.
 Changes to the top menu and footer are saved into `data/translations.json`
 (wording) and `data/entries.json` (where links go) so that every collection and
 post page shows the same menu. The editor saves all the files when you save.
+
+### Behind the shoot (gear and role)
+
+Open any collection in the editor and scroll to **Behind the shoot**. It adds a
+box beside the collection's title showing what you did and the gear you used:
+
+- **What I did** — type it, or tap a shortcut (Shot & edited, Shot only, Edited
+  only). There is an optional English version.
+- **Gear** — **+ Add gear** for each line: a label (Camera, Lens, Audio, Editing…,
+  with an optional English label) and the gear itself (Sony A7 IV…).
+- Leave everything empty and no box appears. Empty lines are dropped on save.
+- The box heading ("Detrás de cámaras" / "Behind the shoot") is the key
+  `entry.credits-title` in `data/translations.json`.
+
+It is stored on the collection in `data/entries.json` as `credits`.
 
 ### Photos
 

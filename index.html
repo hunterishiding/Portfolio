@@ -149,7 +149,7 @@ section.view.active{display:block;}
 .hero-copy .greeting{
   font-family:var(--display); font-weight:800;
   font-size:clamp(1.3rem,2.6vw,1.9rem);
-  color:var(--cream); margin:0 0 -.15em;
+  color:var(--cream); margin:0 0 .4em;   /* breathing room above the wordmark, like the role line below it */
 }
 .hero-copy .wordmark{
   width:clamp(240px,42vw,460px); height:auto; margin:0 auto;
@@ -219,7 +219,7 @@ section.view.active{display:block;}
 /* The olive blob is a transparent PNG from the Canva file; the four app
    icons are absolutely positioned on top of it in a 2x2. */
 .blob-stack{position:relative; width:100%; max-width:330px; margin:0 auto;}
-.blob-stack .blob{width:100%;}
+.blob-stack .blob{width:100%; transform:scale(1.4);}   /* grows the blob around its centre, so the icons sit inside it, not on its edge; no layout shift */
 .icon-grid{
   position:absolute; inset:0;
   display:grid; grid-template-columns:1fr 1fr;
@@ -599,7 +599,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
         </figure>
       </div>
 
-      <button class="btn-wide" data-view="gallery">Click here to see all my work</button>
+      <button class="btn-wide" data-view="gallery" data-i18n="home.btn-work" data-en="Click here to see all my work">Haz click aquí para ver todo mi trabajo</button>
     </div>
   </div>
 
@@ -619,7 +619,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
       <div class="band-copy">
         <h2 data-i18n="home.band-title" data-en="From shooting to editing,&lt;br&gt;and everything in between.">Desde el rodaje a la edición,<br>y todo lo que hay en medio&nbsp;</h2>
         <p data-i18n="home.band-text" data-en="Most of what I create starts as an excuse to grab a camera, then it turns into something I want to keep telling people about.">La mayoría de lo que hago surge como una excusa para tomar la cámara, y luego se transforma en algo de lo que no puedo parar de hablar.</p>
-        <button class="btn-light" data-view="about">Read more about me</button>
+        <button class="btn-light" data-view="about" data-i18n="home.btn-about" data-en="Read more about me">Conoce más sobre mí</button>
       </div>
     </div>
   </div>
@@ -629,7 +629,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
     <div class="wrap">
       <h2 data-i18n="home.sayhi-title" data-en="Come say hi.">Ven a saludar</h2>
       <p data-i18n="home.sayhi-text" data-en="Open to freelance work, collaborations, and anyone who wants to talk about cameras, ecosystems and a bunch of other stuff.">Abierto a trabajo freelance, colaboraciones y a cualquiera que quiera hablar sobre cámaras, ecosistemas y muchos otros temas.</p>
-      <button class="btn-dark" data-view="contact">Get in Touch</button>
+      <button class="btn-dark" data-view="contact" data-i18n="home.btn-contact" data-en="Get in Touch">Ponte en contacto</button>
     </div>
   </div>
 </section>

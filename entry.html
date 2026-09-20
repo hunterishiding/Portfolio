@@ -82,6 +82,21 @@ nav.links a:hover{opacity:1;}
 .lang-btn{font-size:.76rem; color:var(--sand); opacity:.75; border:1px solid rgba(231,226,208,.35);
   border-radius:6px; padding:4px 10px; flex:none; background:none;}
 .lang-btn:hover{opacity:1; background:rgba(231,226,208,.08);}
+.entry-head .wrap.has-credits{display:grid; grid-template-columns:minmax(0,1fr) minmax(270px,380px);
+  gap:24px 64px; align-items:end;}
+
+/* "Behind the shoot" box: what I did + the gear I used. Data lives in entry.credits. */
+.credits{background:rgba(231,226,208,.06); border:1px solid rgba(231,226,208,.16);
+  border-radius:var(--radius); padding:22px 26px 14px;}
+.credits-title{font-family:var(--body); font-size:.72rem; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--sand); opacity:.7; margin:0 0 12px;}
+.credits-role{font-family:var(--display); font-weight:800; font-size:1.3rem; line-height:1.2;
+  letter-spacing:-.01em; color:var(--cream); margin:0 0 14px;}
+.credits-list{margin:0;}
+.credits-list > div{display:flex; justify-content:space-between; align-items:baseline; gap:18px;
+  padding:10px 0; border-top:1px solid rgba(231,226,208,.13); font-size:.92rem; line-height:1.35;}
+.credits-list dt{color:var(--sand); opacity:.72; flex:none;}
+.credits-list dd{margin:0; color:var(--cream); text-align:right;}
 .banner{width:100%; aspect-ratio:21/9; object-fit:cover; border-radius:6px; margin:26px 0 0;}
 
 /* ---------- Collection grid ---------- */
@@ -166,6 +181,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
 }
 
 @media (max-width:900px){
+  .entry-head .wrap.has-credits{grid-template-columns:1fr; gap:34px;}
   .media-grid{grid-template-columns:repeat(2,1fr);}
   .m-item.half{grid-column:span 1;}
   .post-body figure.w-wide{width:auto; margin-left:0; transform:none;}
@@ -338,6 +354,25 @@ function orientClass(o){
   return o === 'v' ? 'v' : (o === 'full' ? 'full' : (o === 'half' ? 'half' : ''));
 }
 
+/* The "Behind the shoot" box. Everything is optional: no role and no gear = no box. */
+function creditsBlock(e, lang){
+  const c = e.credits;
+  if (!c) return '';
+  const pick = (es, en) => (lang === 'en' && en) ? en : es;
+  const role = pick(c.role, c.role_en);
+  const rows = (c.gear || []).filter(g => g && (g.label || g.label_en || g.value));
+  if (!role && !rows.length) return '';
+  const heading = (T && T.strings && T.strings['entry.credits-title']) || {es:'Detrás de cámaras', en:'Behind the shoot'};
+  return `<aside class="credits" data-anim="up">
+      <h2 class="credits-title">${esc(pick(heading.es, heading.en))}</h2>
+      ${role ? `<p class="credits-role">${esc(role)}</p>` : ''}
+      ${rows.length ? `<dl class="credits-list">${rows.map(g => {
+        const label = pick(g.label, g.label_en);
+        return `<div>${label ? `<dt>${esc(label)}</dt>` : ''}<dd>${esc(g.value || '')}</dd></div>`;
+      }).join('')}</dl>` : ''}
+    </aside>`;
+}
+
 function renderCollection(e, lang){
   const title    = (lang === 'en' && e.title_en)    ? e.title_en    : e.title;
   const subtitle = (lang === 'en' && e.subtitle_en) ? e.subtitle_en : e.subtitle;
@@ -350,14 +385,19 @@ function renderCollection(e, lang){
       ${m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : ''}
     </figure>`).join('');
 
+  const credits = creditsBlock(e, lang);
+
   main.innerHTML = `
     <div class="entry-head">
-      <div class="wrap">
-        <a class="back" href="index.html#gallery" data-en="">← back to gallery</a>
-        ${e.year ? `<div class="meta">${esc(e.year)}</div>` : ''}
-        <h1>${esc(title || 'Untitled')}</h1>
-        ${subtitle ? `<p class="subtitle">${esc(subtitle)}</p>` : ''}
-        ${desc ? `<p class="lede">${esc(desc)}</p>` : ''}
+      <div class="wrap${credits ? ' has-credits' : ''}">
+        <div class="head-text">
+          <a class="back" href="index.html#gallery" data-en="">← back to gallery</a>
+          ${e.year ? `<div class="meta">${esc(e.year)}</div>` : ''}
+          <h1>${esc(title || 'Untitled')}</h1>
+          ${subtitle ? `<p class="subtitle">${esc(subtitle)}</p>` : ''}
+          ${desc ? `<p class="lede">${esc(desc)}</p>` : ''}
+        </div>
+        ${credits}
       </div>
     </div>
     ${e.banner ? `<div class="wrap"><img class="banner" src="${esc(e.banner)}" alt=""></div>` : ''}

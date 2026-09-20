@@ -45,6 +45,10 @@
       "es": "Copa Jaguar 3v3 Basket",
       "en": "Copa Jaguar 3v3 Basket"
     },
+    "home.btn-work": {
+      "es": "Haz click aquí para ver todo mi trabajo",
+      "en": "Click here to see all my work"
+    },
     "home.band-title": {
       "es": "Desde el rodaje a la edición,<br>y todo lo que hay en medio&nbsp;",
       "en": "From shooting to editing,<br>and everything in between."
@@ -53,6 +57,10 @@
       "es": "La mayoría de lo que hago surge como una excusa para tomar la cámara, y luego se transforma en algo de lo que no puedo parar de hablar.",
       "en": "Most of what I create starts as an excuse to grab a camera, then it turns into something I want to keep telling people about."
     },
+    "home.btn-about": {
+      "es": "Conoce más sobre mí",
+      "en": "Read more about me"
+    },
     "home.sayhi-title": {
       "es": "Ven a saludar",
       "en": "Come say hi."
@@ -60,6 +68,10 @@
     "home.sayhi-text": {
       "es": "Abierto a trabajo freelance, colaboraciones y a cualquiera que quiera hablar sobre cámaras, ecosistemas y muchos otros temas.",
       "en": "Open to freelance work, collaborations, and anyone who wants to talk about cameras, ecosystems and a bunch of other stuff."
+    },
+    "home.btn-contact": {
+      "es": "Ponte en contacto",
+      "en": "Get in Touch"
     },
     "gallery.title": {
       "es": "Esto es lo que hago.",
@@ -124,6 +136,10 @@
     "foot-contact": {
       "es": "Contacto",
       "en": "Contact"
+    },
+    "entry.credits-title": {
+      "es": "Detrás de cámaras",
+      "en": "Behind the shoot"
     }
   }
 }

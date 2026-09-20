@@ -547,6 +547,20 @@ function setupEditing(doc){
 
   setupNew(doc);
 
+  // Buttons inside the page ("see all my work", "Read more about me"...) must not jump to
+  // another page while you are trying to edit them: select them and put the cursor in the
+  // Text box instead. The top menu and footer still navigate so you can browse from here.
+  doc.addEventListener('click', e => {
+    if (!e.isTrusted) return;
+    const b = e.target.closest(LABEL_SEL);
+    if (!b || b.closest('nav.links, .footer-links')) return;
+    e.preventDefault(); e.stopPropagation();
+    doc.querySelectorAll('.ed-label.selt').forEach(x => x.classList.remove('selt'));
+    selLabel = b; selText = null; b.classList.add('selt'); homeControls();
+    const f = ctx.querySelector('[data-lbl="es"]');
+    if (f){ f.focus(); f.select(); }
+  }, true);
+
   doc.addEventListener('click', e => {
     if (!e.isTrusted) return;                 // ignore the editor's own programmatic clicks
     const b = e.target.closest(LABEL_SEL);
@@ -709,7 +723,7 @@ function homeControls(){
       </select>` : ''}
       ${isA ? `<label class="field">Link address</label>
       <input class="field" data-lbl="href" value="${esc(selLabel.getAttribute('href') || '')}">` : ''}
-      <p class="hint">${selLabel.type === 'submit' ? 'This button sends the contact form, so it only has text.' : 'Menu and footer changes also apply to every collection and post page.'}</p>
+      <p class="hint">${selLabel.getAttribute('type') === 'submit' ? 'This button sends the contact form, so it only has text.' : selLabel.closest('nav.links, .footer-links') ? 'Menu and footer changes also apply to every collection and post page.' : 'Just type — the button changes as you go.'}</p>
     </div>`;
   }
 
@@ -990,6 +1004,83 @@ function openEntry(id){
   (e.type === 'note' ? renderPostEditor : renderCollectionEditor)(id, e);
 }
 
+/* "Behind the shoot" — what I did on a collection + the gear I used. Stored as
+   entry.credits = { role, role_en, gear:[{label, label_en, value}] } and shown as a
+   box beside the title on the collection's page. */
+const ROLE_PRESETS = [
+  ['Shot & edited', 'Capturé y edité', 'Shot and edited'],
+  ['Shot only',     'Solo capturé',    'Shot only'],
+  ['Edited only',   'Solo edité',      'Edited only'],
+];
+function creditsGroup(box, e){
+  if (!box) return;
+  const cr = () => {
+    const k = e.credits = e.credits || {};
+    k.gear = k.gear || [];
+    return k;
+  };
+  const draw = focusLast => {
+    const k = e.credits || {}, gear = k.gear || [];
+    box.innerHTML = `<h2>Behind the shoot</h2>
+      <p class="hint">Shows as a box beside this collection's title: what you did, and the gear you used. Leave it all empty for no box.</p>
+      <label class="field">What I did</label>
+      <input class="field" data-cr="role" value="${esc(k.role || '')}" placeholder="e.g. Capturé y edité">
+      <label class="field">What I did — English (optional)</label>
+      <input class="field" data-cr="role_en" value="${esc(k.role_en || '')}" placeholder="e.g. Shot and edited">
+      <div class="row">
+        ${ROLE_PRESETS.map(([n], i) => `<button class="btn" data-cr-preset="${i}">${n}</button>`).join('')}
+      </div>
+      <label class="field" style="margin-top:10px;">Gear</label>
+      ${gear.map((g, i) => `
+        <div style="border-top:1px solid rgba(231,226,208,.14);padding:8px 0 4px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <input class="field" data-g="${i}" data-k="label" placeholder="Cámara" value="${esc(g.label || '')}">
+            <input class="field" data-g="${i}" data-k="label_en" placeholder="Camera (English)" value="${esc(g.label_en || '')}">
+          </div>
+          <input class="field" data-g="${i}" data-k="value" placeholder="Sony A7 IV" value="${esc(g.value || '')}">
+          <button class="btn danger" data-g-rm="${i}">✕ Remove this line</button>
+        </div>`).join('')}
+      <button class="btn" data-cr-add>+ Add gear</button>
+      <p class="hint">Label is the left side (Camera, Lens, Audio, Editing…), gear is the right side. Names like “Sony A7 IV” need no translation.</p>`;
+
+    box.querySelectorAll('[data-cr]').forEach(inp => inp.addEventListener('input', () => {
+      cr()[inp.dataset.cr] = inp.value; markDirty();
+    }));
+    box.querySelectorAll('[data-g]').forEach(inp => inp.addEventListener('input', () => {
+      cr().gear[+inp.dataset.g][inp.dataset.k] = inp.value; markDirty();
+    }));
+    box.querySelectorAll('[data-cr-preset]').forEach(btn => btn.onclick = () => {
+      const [, es, en] = ROLE_PRESETS[+btn.dataset.crPreset];
+      const k = cr(); k.role = es; k.role_en = en;
+      box.querySelector('[data-cr="role"]').value = es;
+      box.querySelector('[data-cr="role_en"]').value = en;
+      markDirty();
+    });
+    box.querySelector('[data-cr-add]').onclick = () => {
+      cr().gear.push({label:'', label_en:'', value:''}); markDirty(); draw(true);
+    };
+    box.querySelectorAll('[data-g-rm]').forEach(btn => btn.onclick = () => {
+      cr().gear.splice(+btn.dataset.gRm, 1); markDirty(); draw();
+    });
+    if (focusLast){
+      const ins = box.querySelectorAll('[data-k="label"]');
+      ins[ins.length - 1]?.focus();
+    }
+  };
+  draw();
+}
+
+/* Drop empty gear lines and empty credits so the data file stays clean. Runs on save. */
+function tidyCredits(){
+  Object.values(db.entries).forEach(en => {
+    const k = en.credits;
+    if (!k) return;
+    k.gear = (k.gear || []).filter(g => (g.label || '').trim() || (g.label_en || '').trim() || (g.value || '').trim());
+    ['role', 'role_en'].forEach(f => { if (!(k[f] || '').trim()) delete k[f]; });
+    if (!k.role && !k.role_en && !k.gear.length) delete en.credits;
+  });
+}
+
 function entryMetaControls(id, e){
   const isNote = e.type === 'note';
   ctx.innerHTML = `
@@ -1028,7 +1119,8 @@ function entryMetaControls(id, e){
                     <button class="btn danger" data-act="banner-remove">Remove banner</button>`
                  : `<button class="btn" data-act="banner-add">Add a banner image…</button>`}
       <p class="hint">A full-width image shown above this collection's grid.</p>
-    </div>` : ''}
+    </div>
+    <div class="group" data-credits></div>` : ''}
     <div class="group"><h2>Content</h2>
       ${isNote
         ? `<button class="btn" data-act="add-fig">Add photo or video…</button>
@@ -1041,6 +1133,8 @@ function entryMetaControls(id, e){
       <button class="btn" data-act="back">← Back to the site</button>
       <button class="btn danger" data-act="del-entry">Delete this ${isNote ? 'post' : 'collection'}</button>
     </div>`;
+
+  if (!isNote) creditsGroup(ctx.querySelector('[data-credits]'), e);
 
   ctx.querySelectorAll('[data-m]').forEach(inp => inp.addEventListener('input', () => {
     e[inp.dataset.m] = inp.value;
@@ -1456,6 +1550,7 @@ const fileB64 = file => new Promise(res => {
 document.getElementById('btn-save').onclick = async () => {
   const saveBtn = document.getElementById('btn-save');
   if (saveBtn.disabled) return; // already committing — ignore a double-click/tap
+  tidyCredits();
   const trJson = collectTranslations();   // before buildHtml so new keys land in the saved page
   const html = buildHtml();
   const json = JSON.stringify(db, null, 2);
