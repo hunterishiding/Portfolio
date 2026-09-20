@@ -308,11 +308,29 @@ window.addEventListener('message', ev => {
   });
 });
 
+/* Zoom = scale the photo up around the crop point and clip it back to its own
+   frame, so the crop sliders then pan around inside the zoomed photo (like the
+   native Photos app). Pure CSS on the <img> — no wrapper needed. */
+function zoomStyle(z, pos, radius){
+  if (!(z > 1)) return '';
+  const [fx, fy] = String(pos || '50% 50%').split(/\s+/).map(v => Math.min(1, Math.max(0, (isNaN(parseFloat(v)) ? 50 : parseFloat(v)) / 100)));
+  const k = 1 - 1 / z, p = n => (n * 100).toFixed(3) + '%';
+  const round = radius ? ` round ${(radius / z).toFixed(2)}px` : '';
+  return `transform:scale(${z});transform-origin:${p(fx)} ${p(fy)};` +
+         `clip-path:inset(${p(fy * k)} ${p((1 - fx) * k)} ${p((1 - fy) * k)} ${p(fx * k)}${round});`;
+}
+
 function mediaTag(m){
   if (m.kind === 'embed') return embedTag(m);
-  const style = m.ar ? ` style="aspect-ratio:${esc(m.ar)};object-position:${esc(m.pos || '50% 50%')}"` : '';
+  const z = parseFloat(m.zoom) || 1;
+  const pos = m.pos || '50% 50%';
+  let st = '';
+  if (m.ar) st += `aspect-ratio:${m.ar};`;
+  if (m.ar || z > 1) st += `object-position:${pos};`;
+  st += zoomStyle(z, pos, 6);
+  const style = st ? ` style="${esc(st)}"` : '';
   return isVideo(m.src)
-    ? `<video src="${esc(m.src)}" controls playsinline preload="metadata"${style}></video>`
+    ? `<video src="${esc(m.src)}" controls playsinline preload="metadata"${m.ar ? ` style="aspect-ratio:${esc(m.ar)};object-position:${esc(pos)}"` : ''}></video>`
     : `<img src="${esc(m.src)}" alt="${esc(m.alt || '')}" loading="lazy"${style}>`;
 }
 

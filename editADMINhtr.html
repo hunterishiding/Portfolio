@@ -235,6 +235,29 @@ const entryHref = id => {
   return (en && en.slug) ? '/' + (en.type === 'note' ? 'notes' : 'work') + '/' + en.slug : 'entry.html?id=' + id;
 };
 const ENTRY_LINK_SEL = 'a[href^="entry.html"], a[href^="/work/"], a[href^="/notes/"]';
+/* Zoom for photos (same maths as entry.html's zoomStyle): scale up around the
+   crop point, clip back to the frame; the crop sliders then pan inside it. */
+function setStyleProp(el, prop, val){
+  const s = (el.getAttribute('style') || '').split(';').map(x => x.trim()).filter(x => x && !x.startsWith(prop + ':'));
+  if (val) s.push(`${prop}:${val}`);
+  if (s.length) el.setAttribute('style', s.join('; ')); else el.removeAttribute('style');
+}
+function imgZoom(el){ return parseFloat(((el.getAttribute('style') || '').match(/transform:\s*scale\(([\d.]+)\)/) || [,1])[1]) || 1; }
+function frameImg(img, z){
+  const st = img.getAttribute('style') || '';
+  const pos = ((st.match(/object-position:\s*([^;]+)/) || [,'50% 50%'])[1]).trim();
+  if (!(z > 1)){
+    ['transform','transform-origin','clip-path'].forEach(p => setStyleProp(img, p, ''));
+    return;
+  }
+  if (!/object-position/.test(st)) setStyleProp(img, 'object-position', pos);
+  const [fx, fy] = pos.split(/\s+/).map(v => Math.min(1, Math.max(0, (isNaN(parseFloat(v)) ? 50 : parseFloat(v)) / 100)));
+  const k = 1 - 1 / z, p = n => (n * 100).toFixed(3) + '%';
+  const r = parseFloat(getComputedStyle(img).borderTopLeftRadius) || 0;
+  setStyleProp(img, 'transform', `scale(${z})`);
+  setStyleProp(img, 'transform-origin', `${p(fx)} ${p(fy)}`);
+  setStyleProp(img, 'clip-path', `inset(${p(fy * k)} ${p((1 - fx) * k)} ${p((1 - fy) * k)} ${p(fx * k)}${r ? ` round ${(r / z).toFixed(2)}px` : ''})`);
+}
 const plainText = h => { const t = document.createElement('textarea'); t.innerHTML = h || ''; return t.value; };
 const curLang = () => (frame.contentWindow && frame.contentWindow.__siteLang) || 'es';
 const BLOCK_SEL = '.g-item,.note,.cred,.about-row,.tile,.hero,.welcome,.band,.sayhi';
@@ -597,11 +620,13 @@ function homeControls(){
       <select class="field" data-img="ar">
         ${AR.map(([l, v]) => `<option value="${v}" ${curAR === v ? 'selected' : ''}>${l}</option>`).join('')}
       </select>
+      <label class="field" data-zoom-label>Zoom — ${Math.round(imgZoom(selImg) * 100)}%</label>
+      <input class="field" type="range" min="100" max="300" step="5" value="${Math.round(imgZoom(selImg) * 100)}" data-img="zoom">
       <label class="field">Crop across — ${px}</label>
-      <input class="field" type="range" min="0" max="100" value="${parseInt(px) || 50}" data-img="x">
+      <input class="field" type="range" min="0" max="100" value="${(isNaN(parseInt(px)) ? 50 : parseInt(px))}" data-img="x">
       <label class="field">Crop down — ${py}</label>
-      <input class="field" type="range" min="0" max="100" value="${parseInt(py) || 50}" data-img="y">
-      <p class="hint">Pick a shape first, then slide to choose what stays in frame.</p>
+      <input class="field" type="range" min="0" max="100" value="${(isNaN(parseInt(py)) ? 50 : parseInt(py))}" data-img="y">
+      <p class="hint">Zoom in, then use the two crop sliders to move around inside the photo. Pick a shape first if you want a different frame.</p>
     </div>`;
   }
 
@@ -719,8 +744,15 @@ function wireHomeControls(){
       let [px, py] = ((st.match(/object-position:\s*([^;]+)/) || [,'50% 50%'])[1]).trim().split(/\s+/);
       if (axis === 'x') px = e.target.value + '%'; else py = e.target.value + '%';
       styleSet(selImg, 'object-position', `${px} ${py}`);
+      frameImg(selImg, imgZoom(selImg));      // keep the zoom's pan point in step
       markDirty();
     });
+  });
+  ctx.querySelector('[data-img="zoom"]')?.addEventListener('input', e => {
+    const z = (+e.target.value) / 100;
+    frameImg(selImg, z);
+    const lbl = ctx.querySelector('[data-zoom-label]'); if (lbl) lbl.textContent = `Zoom — ${e.target.value}%`;
+    markDirty();
   });
 
   ctx.querySelector('[data-txt="size"]')?.addEventListener('change', e => {
@@ -1086,8 +1118,10 @@ function renderCollectionEditor(id, e){
           ${AR.map(([l, v]) => `<option value="${v}" ${(m.ar || '') === v ? 'selected' : ''}>${l}</option>`).join('')}
         </select>
         <input data-i="${i}" data-cap="1" placeholder="caption" value="${esc(m.caption || '')}">
-        <input data-i="${i}" data-px="1" type="range" min="0" max="100" value="${parseInt(pos[0]) || 50}" title="Crop across" style="flex:1 1 45%;">
-        <input data-i="${i}" data-py="1" type="range" min="0" max="100" value="${parseInt(pos[1]) || 50}" title="Crop down" style="flex:1 1 45%;">
+        <input data-i="${i}" data-px="1" type="range" min="0" max="100" value="${(isNaN(parseInt(pos[0])) ? 50 : parseInt(pos[0]))}" title="Crop across" style="flex:1 1 45%;">
+        <input data-i="${i}" data-py="1" type="range" min="0" max="100" value="${(isNaN(parseInt(pos[1])) ? 50 : parseInt(pos[1]))}" title="Crop down" style="flex:1 1 45%;">
+        <label style="flex:1 1 100%;font-size:.68rem;opacity:.75;display:flex;align-items:center;gap:8px;">Zoom
+          <input data-i="${i}" data-zoom="1" type="range" min="100" max="300" step="5" value="${Math.round((parseFloat(m.zoom) || 1) * 100)}" title="Zoom" style="flex:1;"></label>
       </div>
     </div>`;
   }).join('');
@@ -1108,6 +1142,11 @@ function renderCollectionEditor(id, e){
     if (t.dataset.cap) { e.media[i].caption = t.value; markDirty(); }
     if (t.dataset.ar)  { e.media[i].ar = t.value; markDirty(); }
     if (t.dataset.url) { e.media[i].url = extractEmbedUrl(t.value); markDirty(); }
+    if (t.dataset.zoom){
+      const z = (+t.value) / 100;
+      if (z > 1) e.media[i].zoom = z; else delete e.media[i].zoom;
+      markDirty();
+    }
     if (t.dataset.px || t.dataset.py){
       const cur = (e.media[i].pos || '50% 50%').split(/\s+/);
       if (t.dataset.px) cur[0] = t.value + '%';
