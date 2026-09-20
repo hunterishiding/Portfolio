@@ -60,12 +60,11 @@
       "cover": "assets/dsc02404.jpg",
       "media": [
         {
-          "src": "assets/dsc02404.jpg",
-          "orient": "h",
-          "caption": "",
-          "alt": "",
-          "ar": "",
-          "pos": "50% 50%"
+          "kind": "embed",
+          "url": "https://www.instagram.com/reel/Db1mQ8Pxy0z/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==",
+          "provider": "instagram",
+          "caption": "AI vs Machine",
+          "orient": ""
         }
       ]
     },
