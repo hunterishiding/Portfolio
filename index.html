@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"><head>
-
+<html lang="en"><head>
 
 
 
@@ -135,14 +134,18 @@ section.view.active{display:block;}
    Dark green band: pixel avatar on the left, wordmark lockup on the right.
    =========================================================================== */
 .hero{background:var(--pine); padding:6px 0 0; overflow:hidden;}
+/* The avatar and the wordmark lockup are centred TOGETHER on the page, the
+   way the Canva design has them, instead of the avatar hugging the left edge
+   and the lockup floating in whatever space was left over. */
 .hero-inner{
   max-width:var(--page); margin:0 auto;
-  display:grid; grid-template-columns:auto 1fr;
-  align-items:end; gap:20px; padding:0 28px;
+  display:flex; justify-content:center; align-items:flex-end;
+  gap:clamp(24px,6vw,90px); padding:0 28px;
 }
 /* Sits flush on the bottom edge of the green band, as in the Canva file */
-.hero-avatar{width:clamp(150px,20vw,250px); height:auto; align-self:end; margin-bottom:-6px;}
-.hero-copy{text-align:center; padding-bottom:42px;}
+.hero-avatar{width:clamp(160px,24vw,300px); height:auto; flex:0 0 auto; align-self:flex-end; margin-bottom:-6px;}
+/* The lockup is vertically centred in the band; the avatar stays on the floor */
+.hero-copy{flex:0 1 auto; align-self:center; text-align:center; padding:24px 0;}
 .hero-copy .greeting{
   font-family:var(--display); font-weight:800;
   font-size:clamp(1.3rem,2.6vw,1.9rem);
@@ -493,9 +496,9 @@ footer{background:var(--pine-deep); padding:18px 0;}
   nav.links button{font-size:.85rem;}
 
   /* Hero: avatar above the wordmark instead of beside it */
-  .hero-inner{grid-template-columns:1fr; justify-items:center; gap:14px;}
-  .hero-avatar{width:150px; margin-bottom:0;}
-  .hero-copy{padding-bottom:32px;}
+  .hero-inner{flex-direction:column; align-items:center; gap:14px;}
+  .hero-avatar{width:150px; margin-bottom:0; align-self:center;}
+  .hero-copy{padding:0 0 32px;}
 
   /* Photo grid: one card per row, tall basketball card first out of the way */
   .bento{aspect-ratio:auto;}          /* must be reset, or the stacked tiles overflow */
@@ -526,13 +529,13 @@ footer{background:var(--pine-deep); padding:18px 0;}
       <img class="mark" src="assets/hunter-wordmark.png" alt="Hunter">
     </button>
     <nav class="links">
-      <button data-view="home" data-label="nav-home" data-en="home" class="active">inicio</button>
-      <button data-view="gallery" data-label="nav-gallery" data-en="gallery">galería</button>
-      <button data-view="about" data-label="nav-about" data-en="about">sobre mí</button>
-      <button data-view="notes" data-label="nav-notes" data-en="field notes">bitácora</button>
-      <button data-view="contact" data-label="nav-contact" class="" data-en="contact">contacto</button>
+      <button data-view="home" class="active" data-label="nav-home">home</button>
+      <button data-view="gallery" class="" data-label="nav-gallery">gallery</button>
+      <button data-view="about" class="" data-label="nav-about">about</button>
+      <button data-view="notes" class="" data-label="nav-notes">field notes</button>
+      <button data-view="contact" data-label="nav-contact">contact</button>
     </nav>
-    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">ES</button>
+    <button id="langBtn" class="lang-btn" type="button" aria-label="Switch language">EN</button>
   </div>
 </header>
 
@@ -545,7 +548,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
   <!-- Hero -->
   <div class="hero shown">
     <div class="hero-inner">
-      <img class="hero-avatar" src="assets/avatar.png" alt="Pixel-art portrait of Hunter holding a camera" style="object-position:50% 0%">
+      <img class="hero-avatar" src="assets/avatar.png" alt="Pixel-art portrait of Hunter holding a camera">
       <div class="hero-copy">
         <p class="greeting">Hey, I'm</p>
         <img class="wordmark" src="assets/hunter-wordmark.png" alt="Hunter">
@@ -871,7 +874,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
       <img class="mark" src="assets/hunter-wordmark.png" alt="Hunter">
     </button>
     <div class="footer-links">
-      <button data-view="contact" data-label="foot-contact" data-en="Contact">Contacto</button>
+      <button data-view="contact" data-label="foot-contact">Contact</button>
       <a href="https://instagram.com/hunterwashiding" target="_blank" rel="noopener" data-label="foot-instagram">Instagram</a>
     </div>
   </div>
@@ -953,7 +956,10 @@ if (!inEditor) document.querySelectorAll('[data-entry]').forEach(block => {
   const cover = block.querySelector('img, .placeholder-img');
   if (!cover) return;
   cover.classList.add('cover-link');
-  cover.addEventListener('click', () => { location.href = 'entry.html?id=' + id; });
+  cover.addEventListener('click', () => {
+    const a = block.querySelector('a[href^="entry.html"], a[href^="/work/"], a[href^="/notes/"]');
+    location.href = a ? a.getAttribute('href') : 'entry.html?id=' + id;
+  });
 });
 
 
@@ -1002,8 +1008,8 @@ document.getElementById('contact-form').addEventListener('submit', e => {
 
 
 
-<div id="ed-resize" style="display: block; top: -8px; left: -8px;"></div>
+<div id="ed-resize" style="display: none; top: 754.592px; left: 898.75px;"></div>
 <div id="ed-resize"></div>
 <div id="ed-resize"></div>
-<div id="ed-resize"></div>
-<div id="ed-resize"></div></body></html>
+<div id="ed-resize"></div><script src="assets/texture.js" defer></script>
+</body></html>

@@ -227,6 +227,14 @@ const TEXT_SEL  = 'h1,h2,h3,p,figcaption,span.year,span.source,span.label,a.btn-
    version and where it goes. (Clicking still switches pages so you can browse.) */
 const LABEL_SEL = 'nav.links button, .footer-links button, .footer-links a, button.btn-wide, button.btn-light, button.btn-dark';
 const VIEW_NAMES = [['home','Home'],['gallery','Gallery'],['about','About'],['notes','Field notes'],['contact','Contact']];
+/* Custom page addresses: /work/el-salvador instead of entry?id=gal-4 */
+const slugify = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+const entryHref = id => {
+  const en = db.entries[id];
+  return (en && en.slug) ? '/' + (en.type === 'note' ? 'notes' : 'work') + '/' + en.slug : 'entry.html?id=' + id;
+};
+const ENTRY_LINK_SEL = 'a[href^="entry.html"], a[href^="/work/"], a[href^="/notes/"]';
 const plainText = h => { const t = document.createElement('textarea'); t.innerHTML = h || ''; return t.value; };
 const curLang = () => (frame.contentWindow && frame.contentWindow.__siteLang) || 'es';
 const BLOCK_SEL = '.g-item,.note,.cred,.about-row,.tile,.hero,.welcome,.band,.sayhi';
@@ -452,8 +460,9 @@ function setupEditing(doc){
         const nid = uid(src.type === 'note' ? 'note' : 'gal');
         db.entries[nid] = JSON.parse(JSON.stringify(src));
         db.entries[nid].title += ' (copy)';
+        delete db.entries[nid].slug;              // two pages can't share one address
         c.dataset.entry = nid;
-        c.querySelectorAll('a[href^="entry.html"]').forEach(a => a.href = 'entry.html?id=' + nid);
+        c.querySelectorAll(ENTRY_LINK_SEL).forEach(a => a.setAttribute('href', 'entry.html?id=' + nid));
         renderLayers();
       }
       el.parentNode.insertBefore(c, el.nextSibling);
@@ -766,8 +775,8 @@ function wireHomeControls(){
   ctx.querySelector('[data-blk="retarget"]')?.addEventListener('change', e => {
     const newId = e.target.value, el = selBlock;
     if (!newId) delete el.dataset.entry; else el.dataset.entry = newId;
-    el.querySelectorAll('a[href^="entry.html"]').forEach(a => {
-      if (newId) a.setAttribute('href', 'entry.html?id=' + newId);
+    el.querySelectorAll(ENTRY_LINK_SEL).forEach(a => {
+      if (newId) a.setAttribute('href', entryHref(newId));
     });
     markDirty(); renderLayers(); homeControls();
   });
@@ -910,6 +919,13 @@ function entryMetaControls(id, e){
       <input class="field" data-m="title" value="${esc(e.title)}">
       <label class="field">Title — English (optional)</label>
       <input class="field" data-m="title_en" value="${esc(e.title_en || '')}">
+      <label class="field">Page address (optional)</label>
+      <div style="display:flex;align-items:center;gap:0;">
+        <span style="font-size:.78rem;opacity:.7;padding-right:4px;white-space:nowrap;">/${isNote ? 'notes' : 'work'}/</span>
+        <input class="field" data-slug value="${esc(e.slug || '')}" placeholder="${esc(slugify(e.title) || 'my-page-name')}" style="margin:0;flex:1;">
+      </div>
+      <button class="btn" data-act="slug-from-title" style="margin-top:6px;">Use the title</button>
+      <p class="hint" data-slug-hint>Leave blank to keep the plain address. Letters, numbers and dashes only — spaces and accents are converted for you.</p>
       ${isNote ? `
       <label class="field">Category</label>
       <input class="field" data-m="category" value="${esc(e.category || '')}">
@@ -952,6 +968,32 @@ function entryMetaControls(id, e){
     markDirty(); renderLayers();
     if (inp.dataset.m === 'title') syncCardTitle(id, inp.value);
   }));
+
+  const slugBox = ctx.querySelector('[data-slug]');
+  const slugHint = ctx.querySelector('[data-slug-hint]');
+  const applySlug = raw => {
+    const v = slugify(raw);
+    const clash = Object.keys(db.entries).find(k => k !== id && (k === v || (db.entries[k].slug || '') === v));
+    if (v && clash){
+      slugHint.textContent = `“${v}” is already used by “${db.entries[clash].title || clash}”. Pick something different.`;
+      slugHint.style.color = '#C97B5A';
+      return;
+    }
+    if (v) e.slug = v; else delete e.slug;
+    slugHint.style.color = '';
+    slugHint.textContent = v
+      ? `Address: /${isNote ? 'notes' : 'work'}/${v}   (shows on the live site once saved)`
+      : 'Leave blank to keep the plain address.';
+    // Point this page's cards in the site preview at the new address.
+    frame.contentDocument?.querySelectorAll(`[data-entry="${id}"]`).forEach(b =>
+      b.querySelectorAll(ENTRY_LINK_SEL).forEach(a => a.setAttribute('href', entryHref(id))));
+    markDirty();
+  };
+  slugBox.addEventListener('input', () => applySlug(slugBox.value));
+  slugBox.addEventListener('blur', () => { if (slugBox.value) slugBox.value = e.slug || slugify(slugBox.value); });
+  ctx.querySelector('[data-act="slug-from-title"]').onclick = () => {
+    slugBox.value = slugify(e.title); applySlug(slugBox.value);
+  };
 
   ctx.querySelector('[data-act="back"]').onclick = showHome;
   ctx.querySelector('[data-act="del-entry"]').onclick = () => {

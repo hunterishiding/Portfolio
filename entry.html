@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>/* Pretty addresses like /work/el-salvador live one folder deep, so point every relative link back at the site root. */if(/^\/(work|notes)\//.test(location.pathname))document.write('<base href="/">');</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hunter</title>
 
@@ -215,7 +216,31 @@ footer{background:var(--pine-deep); padding:18px 0;}
    whenever the language toggle is used.
    =========================================================================== */
 const params = new URLSearchParams(location.search);
-const id = params.get('id');
+/* The page can be opened three ways: entry?id=gal-4, /work/gal-4, or by the
+   custom address set in the editor, /work/el-salvador. */
+const pathKey = (location.pathname.match(/^\/(?:work|notes)\/([^\/?#]+)/) || [])[1];
+let id = params.get('id') || (pathKey ? decodeURIComponent(pathKey) : '');
+
+function resolveId(d){
+  const all = (d && d.entries) || {};
+  if (all[id]) return id;
+  const want = String(id).toLowerCase();
+  return Object.keys(all).find(k => String(all[k].slug || '').toLowerCase() === want) || id;
+}
+
+/* Show the custom address in the browser bar even when someone arrives on an old
+   entry?id=… link. Skipped on localhost, where the /work/ rewrite doesn't exist. */
+function prettyUrl(){
+  const en = db.entries && db.entries[id];
+  if (!en || !en.slug) return;
+  if (!/^https?:$/.test(location.protocol) || /^(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(location.hostname)) return;
+  const want = '/' + (en.type === 'note' ? 'notes' : 'work') + '/' + en.slug;
+  if (location.pathname === want) return;
+  if (!document.querySelector('base')){
+    const b = document.createElement('base'); b.href = '/'; document.head.prepend(b);
+  }
+  try { history.replaceState(null, '', want); } catch(err) {}
+}
 const main = document.getElementById('main');
 const langBtn = document.getElementById('langBtn');
 
@@ -472,8 +497,9 @@ langBtn?.addEventListener('click', () => {
 
 fetch('data/entries.json', {cache:'no-store'})
   .then(r => r.ok ? r.json() : Promise.reject(r.status))
-  .then(d => { db = d; renderAll(); })
+  .then(d => { db = d; id = resolveId(d); prettyUrl(); renderAll(); })
   .catch(() => notFound('Could not load data/entries.json.'));
 </script>
+<script src="assets/texture.js" defer></script>
 </body>
 </html>
