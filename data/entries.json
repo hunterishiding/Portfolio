@@ -1,7 +1,39 @@
 {
   "site": {
     "instagram": "https://instagram.com/hunterwashiding",
-    "email": "g.alessandroerazo@gmail.com"
+    "email": "g.alessandroerazo@gmail.com",
+    "labels": {
+      "nav-home": {
+        "es": "inicio",
+        "en": "home",
+        "to": "home"
+      },
+      "nav-gallery": {
+        "es": "galería",
+        "en": "gallery",
+        "to": "gallery"
+      },
+      "nav-about": {
+        "es": "sobre mí",
+        "en": "about",
+        "to": "about"
+      },
+      "nav-notes": {
+        "es": "bitácora",
+        "en": "field notes",
+        "to": "notes"
+      },
+      "nav-contact": {
+        "es": "contacto",
+        "en": "contact",
+        "to": "contact"
+      },
+      "foot-contact": {
+        "es": "Contacto",
+        "en": "Contact",
+        "to": "contact"
+      }
+    }
   },
   "entries": {
     "gal-2": {
