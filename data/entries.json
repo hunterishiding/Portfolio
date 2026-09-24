@@ -550,6 +550,24 @@
         "role": "Capturé y edité",
         "role_en": "Shot and edited"
       }
+    },
+    "gal-oyqtba": {
+      "type": "gallery",
+      "title": "Sin Señal - Cortometraje",
+      "year": "2026",
+      "desc": "",
+      "cover": "",
+      "media": [
+        {
+          "kind": "embed",
+          "url": "https://youtu.be/6pStAOY6QzU",
+          "provider": "youtube",
+          "caption": "",
+          "orient": ""
+        }
+      ],
+      "title_en": "Short Film",
+      "slug": "sinsenal"
     }
   }
 }
