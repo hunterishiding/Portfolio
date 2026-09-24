@@ -188,6 +188,10 @@
     "custom.e52hqb": {
       "es": "Or email me directly at <a href=\"mailto:g.alessandroerazo@gmail.com\">g.alessandroerazo@gmail.com</a>.",
       "en": "Or email me directly at&nbsp;<span class=\"inline-flex flex-wrap items-center gap-1.5\"><span>hello@hunterwashiding.com</span></span>"
+    },
+    "custom.dxj8un": {
+      "es": "Cuando la señal desaparece, ¿Cómo rescataremos la conexión?",
+      "en": "Once signal is lost, how do we rescue connection?"
     }
   }
 }
