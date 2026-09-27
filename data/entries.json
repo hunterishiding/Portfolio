@@ -562,12 +562,30 @@
           "kind": "embed",
           "url": "https://youtu.be/ymbad3Sr77A",
           "provider": "youtube",
-          "caption": "Watch on YouTube!",
+          "caption": "Watch the Short!",
+          "orient": ""
+        },
+        {
+          "kind": "embed",
+          "url": "https://youtu.be/KzOoYbDonMk",
+          "provider": "youtube",
+          "caption": "BTS Recap",
           "orient": ""
         }
       ],
       "title_en": "Short Film",
-      "slug": "sinsenal"
+      "slug": "sinsenal",
+      "credits": {
+        "gear": [
+          {
+            "label": "",
+            "label_en": "",
+            "value": "Sony FX3"
+          }
+        ],
+        "role_en": "Wrote, Directed, Shot, Produced, Edited (etc)",
+        "role": "Dirijí, Grabé, Produje, Edité (etc)"
+      }
     }
   }
 }
