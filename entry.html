@@ -203,7 +203,7 @@ footer{background:var(--pine-deep); padding:18px 0;}
     <a href="index.html"><img class="mark" src="assets/hunter-wordmark.png" alt="Hunter"></a>
     <nav class="links">
       <a href="index.html#home" data-label="nav-home">home</a>
-      <a href="index.html#gallery" data-label="nav-gallery">gallery</a>
+      <a href="/work" data-label="nav-gallery">gallery</a>
       <a href="index.html#about" data-label="nav-about">about</a>
       <a href="index.html#notes" data-label="nav-notes">field notes</a>
       <a href="index.html#contact" data-label="nav-contact">contact</a>
@@ -391,7 +391,7 @@ function renderCollection(e, lang){
     <div class="entry-head">
       <div class="wrap${credits ? ' has-credits' : ''}">
         <div class="head-text">
-          <a class="back" href="index.html#gallery" data-en="">← back to gallery</a>
+          <a class="back" href="/work" data-en="">← back to gallery</a>
           ${e.year ? `<div class="meta">${esc(e.year)}</div>` : ''}
           <h1>${esc(title || 'Untitled')}</h1>
           ${subtitle ? `<p class="subtitle">${esc(subtitle)}</p>` : ''}

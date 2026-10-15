@@ -982,14 +982,23 @@ document.querySelectorAll('[data-view]').forEach(el => {
     views.forEach(v => v.classList.toggle('active', v.id === target));
     navButtons.forEach(b => b.classList.toggle('active', b.dataset.view === target));
     window.scrollTo({top: 0, behavior: 'instant'});
-    // Keep the URL in sync so links like hunterwashiding.com/#gallery work.
+    // Keep the URL in sync. The gallery lives at hunterwashiding.com/work;
+    // every other page uses a #hash. On localhost / file:// (where /work
+    // doesn't exist) everything falls back to the #hash.
     // Wrapped because this throws when the page is previewed inside a frame.
-    try { history.replaceState(null, '', '#' + target); } catch (e) {}
+    try {
+      const live = /^https?:$/.test(location.protocol) &&
+        !/^(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(location.hostname);
+      let url = '#' + target;
+      if (live) url = (target === 'gallery') ? '/work' : '/#' + target;
+      history.replaceState(null, '', url);
+    } catch (e) {}
   });
 });
 
-// If someone arrives at hunterwashiding.com/#gallery, open that page directly.
-const initial = location.hash.slice(1);
+// If someone arrives at hunterwashiding.com/work (or an old /#gallery link),
+// open that page directly. Other pages still open from their #hash.
+const initial = /^\/work\/?$/.test(location.pathname) ? 'gallery' : location.hash.slice(1);
 if (initial && document.getElementById(initial)) {
   document.querySelector(`[data-view="${initial}"]`)?.click();
 }
